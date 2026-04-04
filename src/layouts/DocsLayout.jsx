@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useLocation, useOutletContext } from 'react-router-dom';
 
 import ApiNav from '../components/ApiNav';
@@ -318,7 +318,7 @@ export default function DocsLayout() {
 
       <main className="docs-scroll content-area" style={{ padding: isApiPage ? '32px 40px 56px' : '48px 40px' }}>
         <div className="content-inner" style={{ maxWidth: isApiPage ? '980px' : 'var(--content-max-width)', margin: '0 auto' }}>
-          <Outlet />
+          <Outlet context={{ searchTerm }} />
         </div>
       </main>
 

@@ -1,4 +1,5 @@
-ï»¿import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 import Callout from '../components/Callout';
 import CodeBlock from '../components/CodeBlock';
@@ -156,8 +157,8 @@ function OperationCard({ operation }) {
             <div style={sectionTitleStyle}>Request body</div>
             <div style={{ marginBottom: '10px', color: '#a1a1aa', fontSize: '13px' }}>
               <strong style={{ color: '#ffffff' }}>{operation.requestBody.schemaName}</strong>
-              {operation.requestBody.contentType ? ` â€¢ ${operation.requestBody.contentType}` : ''}
-              {operation.requestBody.required ? ' â€¢ required' : ''}
+              {operation.requestBody.contentType ? ` • ${operation.requestBody.contentType}` : ''}
+              {operation.requestBody.required ? ' • required' : ''}
             </div>
             {operation.requestBody.example ? (
               <CodeBlock code={operation.requestBody.example} language="json" compact />
@@ -187,7 +188,40 @@ const sectionTitleStyle = {
   fontWeight: 600,
 };
 
+function operationMatchesSearch(tagName, operation, value) {
+  const haystack = [
+    tagName,
+    operation.method,
+    operation.path,
+    operation.summary,
+    operation.description,
+    ...(operation.security || []),
+    ...(operation.parameters || []).flatMap((parameter) => [
+      parameter.name,
+      parameter.location,
+      parameter.type,
+      parameter.description,
+    ]),
+    operation.requestBody?.schemaName,
+    operation.requestBody?.contentType,
+    ...operation.responses.flatMap((response) => [
+      String(response.status),
+      response.schemaName,
+      response.description,
+      response.contentType,
+    ]),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  return haystack.includes(value);
+}
+
 export default function APIReferencePage() {
+  const outletContext = useOutletContext() ?? {};
+  const searchTerm = outletContext.searchTerm ?? '';
+  const searchValue = searchTerm.trim().toLowerCase();
   const [document, setDocument] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -222,6 +256,25 @@ export default function APIReferencePage() {
     };
   }, []);
 
+  const filteredTags = useMemo(() => {
+    if (!document) {
+      return [];
+    }
+
+    if (!searchValue) {
+      return document.tags;
+    }
+
+    return document.tags
+      .map((tag) => ({
+        ...tag,
+        operations: tag.operations.filter((operation) => operationMatchesSearch(tag.name, operation, searchValue)),
+      }))
+      .filter((tag) => tag.operations.length > 0);
+  }, [document, searchValue]);
+
+  const totalMatches = useMemo(() => filteredTags.reduce((count, tag) => count + tag.operations.length, 0), [filteredTags]);
+
   if (loading) {
     return (
       <div style={{ display: 'grid', gap: '18px' }}>
@@ -255,7 +308,15 @@ export default function APIReferencePage() {
         This page is generated from <strong>/schema.yaml</strong>. When the Django API changes, regenerate the schema and the reference stays aligned with the backend contract.
       </Callout>
 
-      {document.tags.map((tag) => (
+      {searchValue ? (
+        <Callout type="tip" title={`Search results for “${searchTerm}”`}>
+          {totalMatches > 0
+            ? `Showing ${totalMatches} matching endpoint${totalMatches === 1 ? '' : 's'} across ${filteredTags.length} section${filteredTags.length === 1 ? '' : 's'}.`
+            : 'No endpoints match that search yet. Try an HTTP method, path, tag name, or endpoint summary.'}
+        </Callout>
+      ) : null}
+
+      {filteredTags.length === 0 ? null : filteredTags.map((tag) => (
         <section key={tag.name} style={{ display: 'grid', gap: '18px' }}>
           <div>
             <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#ffffff' }}>{tag.name}</h2>
