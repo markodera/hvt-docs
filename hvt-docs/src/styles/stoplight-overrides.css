@@ -1,0 +1,67 @@
+:root {
+  --color-canvas-default: #0a0a0a;
+  --color-canvas-subtle: #111111;
+  --color-canvas-inset: #18181b;
+  --color-border-default: #27272a;
+  --color-accent-fg: #7c3aed;
+  --color-accent-emphasis: #7c3aed;
+  --color-fg-default: #ffffff;
+  --color-fg-muted: #a1a1aa;
+  --color-fg-subtle: #71717a;
+  --color-success-fg: #4ade80;
+  --color-danger-fg: #f87171;
+  --color-warning-fg: #fbbf24;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+}
+
+.sl-bg-canvas-pure,
+.sl-bg-canvas {
+  background: #0a0a0a !important;
+}
+
+.sl-bg-canvas-subtle,
+.sl-bg-canvas-inset {
+  background: #111111 !important;
+}
+
+.sl-border,
+.sl-border-t,
+.sl-border-r,
+.sl-border-b,
+.sl-border-l {
+  border-color: #27272a !important;
+}
+
+.sl-text-body,
+.sl-text-muted,
+.sl-prose {
+  color: #a1a1aa !important;
+}
+
+.sl-heading,
+.sl-text-heading,
+.sl-prose h1,
+.sl-prose h2,
+.sl-prose h3 {
+  color: #ffffff !important;
+}
+
+.sl-code,
+.sl-code-viewer,
+.sl-code-viewer pre {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace !important;
+}
+
+.sl-panel,
+.sl-card {
+  background: #111111 !important;
+}
+
+.sl-bg-primary,
+.sl-bg-primary-tint {
+  background: #7c3aed !important;
+}
+
+.sl-text-primary {
+  color: #7c3aed !important;
+}
