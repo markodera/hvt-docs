@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+ï»¿import { useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 import Callout from '../components/Callout';
@@ -157,8 +157,8 @@ function OperationCard({ operation }) {
             <div style={sectionTitleStyle}>Request body</div>
             <div style={{ marginBottom: '10px', color: '#a1a1aa', fontSize: '13px' }}>
               <strong style={{ color: '#ffffff' }}>{operation.requestBody.schemaName}</strong>
-              {operation.requestBody.contentType ? ` • ${operation.requestBody.contentType}` : ''}
-              {operation.requestBody.required ? ' • required' : ''}
+              {operation.requestBody.contentType ? ` â€¢ ${operation.requestBody.contentType}` : ''}
+              {operation.requestBody.required ? ' â€¢ required' : ''}
             </div>
             {operation.requestBody.example ? (
               <CodeBlock code={operation.requestBody.example} language="json" compact />
@@ -300,7 +300,7 @@ export default function APIReferencePage() {
           {document.title || 'API Reference'}
         </h1>
         <p style={{ margin: '12px 0 0', color: '#a1a1aa', fontSize: '15px', lineHeight: 1.8 }}>
-          This is the contract-level reference for the HVT API. If you are new to the platform, start with the overview and quickstart first, then return here when you want the exact request and response shapes.
+          This is the contract-level reference for the HVT API. If you are new to HVT, start with the overview and quickstart first, then return here when you want the exact request and response shapes.
         </p>
       </header>
 
@@ -309,7 +309,7 @@ export default function APIReferencePage() {
       </Callout>
 
       {searchValue ? (
-        <Callout type="tip" title={`Search results for “${searchTerm}”`}>
+        <Callout type="tip" title={`Search results for â€œ${searchTerm}â€`}>
           {totalMatches > 0
             ? `Showing ${totalMatches} matching endpoint${totalMatches === 1 ? '' : 's'} across ${filteredTags.length} section${filteredTags.length === 1 ? '' : 's'}.`
             : 'No endpoints match that search yet. Try an HTTP method, path, tag name, or endpoint summary.'}
@@ -330,3 +330,4 @@ export default function APIReferencePage() {
     </div>
   );
 }
+
