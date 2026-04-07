@@ -92,6 +92,10 @@ export default function SDKGuidePage() {
           The auth surface includes both dashboard auth for your team and runtime auth for the users of your app. The naming keeps those two jobs separate so you do not accidentally mix them.
         </p>
         <CodeBlock code={AUTH_METHODS} language="javascript" />
+        <div style={{ height: 16 }} />
+        <Callout type="info" title="Browser session defaults">
+          In browser flows, HVT uses a <strong>15-minute</strong> access token and a <strong>7-day</strong> refresh session. Refresh before access-token expiry, or let your shared browser client do it automatically, so users stay signed in during normal activity.
+        </Callout>
       </DocSection>
 
       <DocSection id="api-key-methods" title="4. API key methods">

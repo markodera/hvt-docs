@@ -35,7 +35,7 @@
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
 }
 
 html {
@@ -44,7 +44,8 @@ html {
 
 body {
   margin: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: var(--bg-primary);
   color: var(--text-primary);
   font-size: 15px;
@@ -102,6 +103,8 @@ pre,
   background:
     radial-gradient(circle at top center, rgba(124, 58, 237, 0.12), transparent 48%),
     var(--bg-primary);
+  min-height: calc(100dvh - var(--topbar-height));
+  overflow-x: hidden;
 }
 
 .docs-divider {
@@ -112,6 +115,11 @@ pre,
 
 .docs-content {
   color: var(--text-secondary);
+  min-width: 0;
+}
+
+.docs-content > * {
+  max-width: 100%;
 }
 
 .docs-content p {
@@ -148,24 +156,77 @@ pre,
 }
 
 .content-area {
-  height: calc(100vh - var(--topbar-height));
+  height: calc(100dvh - var(--topbar-height));
   overflow-y: auto;
+  overflow-x: clip;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
 }
 
 .content-area.api-page {
-  padding: 0 !important;
-  overflow: hidden !important;
-  height: calc(100vh - 52px) !important;
-  display: flex !important;
-  flex-direction: column !important;
+  padding-top: 32px !important;
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
 .content-area.api-page .content-inner {
-  flex: 1 1 auto;
   width: 100%;
-  max-width: none !important;
-  margin: 0 !important;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
+  max-width: min(100%, 980px) !important;
+}
+
+.content-inner {
+  width: 100%;
+  min-width: 0;
+}
+
+.docs-code-block {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.docs-code-block__toolbar {
+  min-width: 0;
+}
+
+.docs-code-block__label {
+  min-width: 0;
+}
+
+.docs-code-block__copy {
+  flex-shrink: 0;
+}
+
+.docs-code-block__pre {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+}
+
+.docs-code-block__code {
+  display: block;
+  min-width: max-content;
+}
+
+@media (max-width: 767px) {
+  .content-area {
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+
+  .docs-code-block__toolbar {
+    padding: 10px 12px !important;
+  }
+
+  .docs-code-block__pre {
+    overflow-x: hidden !important;
+    padding: 12px 14px !important;
+    font-size: 12px !important;
+  }
+
+  .docs-code-block__code {
+    min-width: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 }

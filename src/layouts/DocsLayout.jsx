@@ -80,7 +80,7 @@ function RightPanel({ pathname }) {
         top: 'var(--topbar-height)',
         right: 0,
         width: 'var(--right-panel-width)',
-        height: 'calc(100vh - var(--topbar-height))',
+        height: 'calc(100dvh - var(--topbar-height))',
         overflowY: 'auto',
         borderLeft: '1px solid #27272a',
         background: '#0d0d0d',
@@ -213,12 +213,21 @@ export default function DocsLayout() {
   }, [isApiPage, location.hash]);
 
   useEffect(() => {
-    if (!isApiPage) {
-      return undefined;
+    const previousOverflow = document.body.style.overflow;
+
+    if (mobileSidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
     }
 
-    const scroller = document.querySelector('.content-area');
-    if (!scroller) {
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileSidebarOpen]);
+
+  useEffect(() => {
+    if (!isApiPage) {
       return undefined;
     }
 
@@ -239,18 +248,18 @@ export default function DocsLayout() {
       }
     };
 
-    scroller.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     window.setTimeout(update, 120);
 
     return () => {
-      scroller.removeEventListener('scroll', update);
+      window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
     };
   }, [isApiPage, location.pathname]);
 
   return (
-    <div className="docs-shell-bg" style={{ height: 'calc(100vh - var(--topbar-height))', color: '#ffffff' }}>
+    <div className="docs-shell-bg" style={{ minHeight: 'calc(100dvh - var(--topbar-height))', color: '#ffffff' }}>
       {mobileSidebarOpen ? <div className="docs-mobile-overlay" onClick={() => setMobileSidebarOpen(false)} /> : null}
 
       <aside
@@ -259,8 +268,8 @@ export default function DocsLayout() {
           position: 'fixed',
           top: 'var(--topbar-height)',
           left: 0,
-          width: 'var(--sidebar-width)',
-          height: 'calc(100vh - var(--topbar-height))',
+          width: 'min(var(--sidebar-width), calc(100vw - 32px))',
+          height: 'calc(100dvh - var(--topbar-height))',
           display: 'flex',
           flexDirection: 'column',
           borderRight: '1px solid #27272a',
@@ -316,8 +325,11 @@ export default function DocsLayout() {
         </div>
       </aside>
 
-      <main className="docs-scroll content-area" style={{ padding: isApiPage ? '32px 40px 56px' : '48px 40px' }}>
-        <div className="content-inner" style={{ maxWidth: isApiPage ? '980px' : 'var(--content-max-width)', margin: '0 auto' }}>
+      <main
+        className={`docs-scroll content-area${isApiPage ? ' api-page' : ''}`}
+        style={{ padding: isApiPage ? '32px 40px 64px' : '48px 40px 72px' }}
+      >
+        <div className="content-inner" style={{ maxWidth: isApiPage ? 'min(100%, 980px)' : 'var(--content-max-width)', margin: '0 auto' }}>
           <Outlet context={{ searchTerm }} />
         </div>
       </main>
@@ -349,6 +361,7 @@ export default function DocsLayout() {
           inset: var(--topbar-height) 0 0 0;
           z-index: 35;
           background: rgba(0, 0, 0, 0.45);
+          backdrop-filter: blur(2px);
         }
 
         @media (min-width: 768px) {
@@ -362,8 +375,17 @@ export default function DocsLayout() {
         }
 
         @media (max-width: 767px) {
+          .docs-sidebar {
+            width: min(86vw, 320px) !important;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+          }
+
           .content-area {
-            padding: 32px 20px !important;
+            padding: 28px 16px calc(40px + env(safe-area-inset-bottom, 0px)) !important;
+          }
+
+          .content-area.api-page {
+            padding: 24px 16px calc(40px + env(safe-area-inset-bottom, 0px)) !important;
           }
         }
 

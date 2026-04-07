@@ -1,5 +1,6 @@
 import DocPage, { DocSection } from '../../components/DocPage';
 import CodeBlock from '../../components/CodeBlock';
+import Callout from '../../components/Callout';
 
 const CONTROL = `await client.auth.login({ email, password })
 await client.auth.me()
@@ -36,6 +37,10 @@ export default function SDKAuthPage() {
     >
       <DocSection id="control-plane-methods" title="Control-plane methods">
         <CodeBlock code={CONTROL} language="javascript" />
+        <div style={{ height: 16 }} />
+        <Callout type="info" title="Default browser lifetime">
+          Cookie-backed browser sessions use a <strong>15-minute</strong> access token and a <strong>7-day</strong> refresh session. A browser client should refresh automatically before expiry so normal dashboard use does not bounce users back to login.
+        </Callout>
       </DocSection>
 
       <DocSection id="runtime-methods" title="Runtime methods">

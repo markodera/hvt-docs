@@ -101,6 +101,10 @@ export default function QuickstartPage() {
           This returns the runtime session and user context for the project that belongs to your API key.
         </p>
         <CodeBlock code={LOGIN_CODE} language="javascript" />
+        <div style={{ height: 16 }} />
+        <Callout type="info" title="Runtime browser sessions">
+          Browser-based runtime sessions use a <strong>15-minute</strong> access token and a <strong>7-day</strong> refresh session. Keep refresh wired up so users stay signed in instead of being forced back to login every 15 minutes.
+        </Callout>
       </DocSection>
     </DocPage>
   );

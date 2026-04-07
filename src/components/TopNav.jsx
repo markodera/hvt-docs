@@ -15,9 +15,22 @@ export default function TopNav() {
     setMobileSidebarOpen(false);
   }, [location.pathname, location.hash]);
 
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+
+    if (mobileSidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileSidebarOpen]);
+
   return (
     <>
       <nav
+        className="docs-topnav"
         style={{
           height: '52px',
           background: '#111111',
@@ -57,7 +70,7 @@ export default function TopNav() {
 
           <Link to="/introduction" style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
             <HvtLogoMark className="h-8 w-8 shrink-0" />
-            <div style={{ minWidth: 0, lineHeight: 1 }}>
+            <div className="docs-brand-copy" style={{ minWidth: 0, lineHeight: 1 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', minWidth: 0 }}>
                 <span
                   style={{
@@ -73,7 +86,9 @@ export default function TopNav() {
                 </span>
                 <span style={{ color: '#a1a1aa', fontSize: '13px', fontWeight: 500, whiteSpace: 'nowrap' }}>Docs</span>
               </div>
-              <div style={{ marginTop: '4px', color: '#71717a', fontSize: '11px', whiteSpace: 'nowrap' }}>docs.hvts.app</div>
+              <div className="docs-brand-meta" style={{ marginTop: '4px', color: '#71717a', fontSize: '11px', whiteSpace: 'nowrap' }}>
+                docs.hvts.app
+              </div>
             </div>
           </Link>
         </div>
@@ -148,6 +163,7 @@ export default function TopNav() {
           </a>
           <Link
             to="/quickstart"
+            className="docs-topnav-cta"
             style={{
               background: 'transparent',
               border: '1px solid rgba(124, 58, 237, 0.6)',
@@ -187,12 +203,34 @@ export default function TopNav() {
           }
         }
 
+        @media (max-width: 640px) {
+          .docs-topnav {
+            padding: 0 14px !important;
+            gap: 12px !important;
+          }
+
+          .docs-brand-meta {
+            display: none !important;
+          }
+
+          .docs-topnav-cta {
+            padding: 6px 10px !important;
+            font-size: 12px !important;
+          }
+        }
+
         @media (max-width: 767px) {
           .docs-topnav-links .docs-topnav-link {
             display: none !important;
           }
 
           .docs-topnav-search {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 420px) {
+          .docs-topnav-cta {
             display: none !important;
           }
         }

@@ -151,12 +151,14 @@ if (!permissions.includes('orders.read.own')) {
     anchors: [
       { id: 'create-endpoint', label: 'Create an endpoint' },
       { id: 'deliveries', label: 'Deliveries and retries' },
+      { id: 'event-catalogue', label: 'Event catalogue' },
+      { id: 'api-key-expiry', label: 'API key expiry' },
       { id: 'signature', label: 'Signature verification' },
     ],
     sample: {
       label: 'Payload',
       code: `{
-  "event": "user.registered",
+  "event": "user.created",
   "project_slug": "storefront-prod"
 }`,
     },

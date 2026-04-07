@@ -95,6 +95,10 @@ export default function AuthGuidePage() {
           Refresh keeps the current session valid. Logout clears the current session. In both cases, HVT keeps the organisation and project context attached to the authenticated user.
         </p>
         <CodeBlock code={REFRESH} language="javascript" />
+        <div style={{ height: 16 }} />
+        <Callout type="info" title="Session lifetime">
+          Dashboard browser sessions use a <strong>15-minute</strong> access token plus a <strong>7-day</strong> refresh session. The dashboard refreshes automatically while the session is still valid, so active use should not force a fresh login every 15 minutes.
+        </Callout>
       </DocSection>
     </DocPage>
   );

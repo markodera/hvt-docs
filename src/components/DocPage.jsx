@@ -12,10 +12,12 @@ export function DocSection({ id, title, children }) {
 
 export default function DocPage({ title, subtitle, next, children }) {
   return (
-    <article>
+    <article style={{ width: '100%', minWidth: 0 }}>
       <header>
-        <h1 style={{ margin: 0, fontSize: '28px', lineHeight: 1.2, fontWeight: 700, color: '#ffffff' }}>{title}</h1>
-        <p style={{ margin: '12px 0 0', color: '#a1a1aa', fontSize: '15px', lineHeight: 1.8 }}>{subtitle}</p>
+        <h1 style={{ margin: 0, fontSize: 'clamp(26px, 6vw, 28px)', lineHeight: 1.2, fontWeight: 700, color: '#ffffff', wordBreak: 'break-word' }}>
+          {title}
+        </h1>
+        <p style={{ margin: '12px 0 0', color: '#a1a1aa', fontSize: '15px', lineHeight: 1.8, maxWidth: '100%' }}>{subtitle}</p>
         <div className="docs-divider" style={{ margin: '22px 0 32px' }} />
       </header>
 
