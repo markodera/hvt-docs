@@ -1,4 +1,4 @@
-﻿import DocPage, { DocSection } from '../components/DocPage';
+import DocPage, { DocSection } from '../components/DocPage';
 import Callout from '../components/Callout';
 import CodeBlock from '../components/CodeBlock';
 
@@ -15,14 +15,17 @@ const REGISTER_CODE = `await hvt.auth.register({
   email: 'user@example.com',
   password1: 'Strongpass123!',
   password2: 'Strongpass123!'
-})`;
+})
+
+// default project signup roles may be assigned here`;
 
 const LOGIN_CODE = `const session = await hvt.auth.runtimeLogin({
   email: 'user@example.com',
   password: 'Strongpass123!'
 })
 
-// session.user carries organization and project context`;
+// session.user stays project-aware
+// and the token can carry app_roles + app_permissions`;
 
 export default function QuickstartPage() {
   return (
@@ -56,6 +59,9 @@ export default function QuickstartPage() {
       <DocSection id="create-project" title="3. Create a project">
         <p>
           Create one project for the app or environment you want to connect. A common starting point is one project per app environment, such as <strong>storefront-prod</strong> or <strong>storefront-staging</strong>.
+        </p>
+        <p>
+          That same project can also hold the dynamic app roles and permissions for your runtime users, such as <strong>buyer</strong>, <strong>seller</strong>, or <strong>teacher</strong>.
         </p>
       </DocSection>
 

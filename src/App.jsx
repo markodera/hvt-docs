@@ -9,6 +9,7 @@ import QuickstartPage from './pages/QuickstartPage';
 import AuditLogsGuidePage from './pages/guides/AuditLogsGuidePage';
 import AuthGuidePage from './pages/guides/AuthGuidePage';
 import ProjectsGuidePage from './pages/guides/ProjectsGuidePage';
+import RuntimeRolesGuidePage from './pages/guides/RuntimeRolesGuidePage';
 import SDKGuidePage from './pages/guides/SDKGuidePage';
 import WebhooksGuidePage from './pages/guides/WebhooksGuidePage';
 import SDKAuthPage from './pages/sdk/SDKAuthPage';
@@ -55,6 +56,7 @@ const docsRoutes = [
   { path: 'concepts', element: <ConceptsPage /> },
   { path: 'guides/auth', element: <AuthGuidePage /> },
   { path: 'guides/projects', element: <ProjectsGuidePage /> },
+  { path: 'guides/runtime-roles', element: <RuntimeRolesGuidePage /> },
   { path: 'guides/webhooks', element: <WebhooksGuidePage /> },
   { path: 'guides/audit-logs', element: <AuditLogsGuidePage /> },
   { path: 'guides/sdk', element: <SDKGuidePage /> },

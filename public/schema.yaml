@@ -42,7 +42,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JWT'
+                $ref: '#/components/schemas/CustomLogin'
           description: ''
   /api/v1/auth/logout/:
     post:
@@ -171,7 +171,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RestAuthDetail'
+                $ref: '#/components/schemas/PasswordChange'
           description: ''
   /api/v1/auth/password/reset/:
     post:
@@ -205,7 +205,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RestAuthDetail'
+                $ref: '#/components/schemas/HVTPasswordReset'
           description: ''
   /api/v1/auth/password/reset/confirm/{uidb64}/{token}/:
     post:
@@ -341,7 +341,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RestAuthDetail'
+                $ref: '#/components/schemas/ResendEmailVerification'
           description: ''
   /api/v1/auth/register/verify-email/:
     post:
@@ -371,11 +371,7 @@ paths:
       - {}
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestAuthDetail'
-          description: ''
+          description: No response body
   /api/v1/auth/runtime/login/:
     post:
       operationId: auth_runtime_login_create
@@ -1725,6 +1721,484 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/organizations/current/projects/{project_pk}/access/:
+    get:
+      operationId: organizations_current_projects_access_retrieve
+      description: Return the authenticated user's app roles and effective permissions
+        for a project.
+      summary: Get current project access
+      parameters:
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectUserRoleAccess'
+          description: ''
+  /api/v1/organizations/current/projects/{project_pk}/permissions/:
+    get:
+      operationId: organizations_current_projects_permissions_list
+      description: List dynamic app permissions for a project in the current organization.
+        Owner/admin only.
+      summary: List project app permissions
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Projects
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectPermissionList'
+          description: ''
+    post:
+      operationId: organizations_current_projects_permissions_create
+      description: Create a dynamic app permission for a project. Owner/admin only.
+      summary: Create project app permission
+      parameters:
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectPermissionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectPermissionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectPermissionRequest'
+        required: true
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPermission'
+          description: ''
+  /api/v1/organizations/current/projects/{project_pk}/permissions/{id}/:
+    get:
+      operationId: organizations_current_projects_permissions_retrieve
+      description: Retrieve a dynamic app permission for a project. Owner/admin only.
+      summary: Retrieve project app permission
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPermission'
+          description: ''
+    put:
+      operationId: organizations_current_projects_permissions_update
+      description: Retrieve, update, or delete a project app permission.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectPermissionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectPermissionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectPermissionRequest'
+        required: true
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPermission'
+          description: ''
+    patch:
+      operationId: organizations_current_projects_permissions_partial_update
+      description: Update a dynamic app permission for a project. Owner/admin only.
+      summary: Update project app permission
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectPermissionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectPermissionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectPermissionRequest'
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPermission'
+          description: ''
+    delete:
+      operationId: organizations_current_projects_permissions_destroy
+      description: Delete a dynamic app permission for a project after unlinking it
+        from roles. Owner/admin only.
+      summary: Delete project app permission
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/organizations/current/projects/{project_pk}/roles/:
+    get:
+      operationId: organizations_current_projects_roles_list
+      description: List dynamic app roles for a project in the current organization.
+        Owner/admin only.
+      summary: List project app roles
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Projects
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectRoleList'
+          description: ''
+    post:
+      operationId: organizations_current_projects_roles_create
+      description: Create a dynamic app role and attach permissions. Owner/admin only.
+      summary: Create project app role
+      parameters:
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectRoleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectRoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectRoleRequest'
+        required: true
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectRole'
+          description: ''
+  /api/v1/organizations/current/projects/{project_pk}/roles/{id}/:
+    get:
+      operationId: organizations_current_projects_roles_retrieve
+      description: Retrieve a dynamic app role for a project. Owner/admin only.
+      summary: Retrieve project app role
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectRole'
+          description: ''
+    put:
+      operationId: organizations_current_projects_roles_update
+      description: Retrieve, update, or delete a project app role.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectRoleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectRoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectRoleRequest'
+        required: true
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectRole'
+          description: ''
+    patch:
+      operationId: organizations_current_projects_roles_partial_update
+      description: Update a dynamic app role and its permissions. Owner/admin only.
+      summary: Update project app role
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectRoleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectRoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectRoleRequest'
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectRole'
+          description: ''
+    delete:
+      operationId: organizations_current_projects_roles_destroy
+      description: Delete a dynamic app role after removing it from users. Owner/admin
+        only.
+      summary: Delete project app role
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/v1/organizations/current/projects/{project_pk}/social-providers/:
     get:
       operationId: organizations_current_projects_social_providers_list
@@ -1954,6 +2428,123 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/organizations/current/projects/{project_pk}/users/{user_pk}/roles/:
+    get:
+      operationId: organizations_current_projects_users_roles_retrieve
+      description: Get a user's assigned app roles and effective permissions for a
+        project. Owner/admin only.
+      summary: Get user app access for a project
+      parameters:
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: user_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectUserRoleAccess'
+          description: ''
+    put:
+      operationId: organizations_current_projects_users_roles_update
+      description: Replace a user's assigned app roles for a project. Owner/admin
+        only.
+      summary: Replace user app roles for a project
+      parameters:
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: user_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUserRoleAssignmentUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectUserRoleAssignmentUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectUserRoleAssignmentUpdateRequest'
+        required: true
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectUserRoleAccess'
+          description: ''
+    patch:
+      operationId: organizations_current_projects_users_roles_partial_update
+      description: Replace a user's assigned app roles for a project. Owner/admin
+        only.
+      summary: Replace user app roles for a project
+      parameters:
+      - in: path
+        name: project_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: user_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectUserRoleAssignmentUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectUserRoleAssignmentUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectUserRoleAssignmentUpdateRequest'
+      security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - APIKeyAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectUserRoleAccess'
+          description: ''
   /api/v1/organizations/current/webhooks/:
     get:
       operationId: organizations_current_webhooks_list
@@ -2838,6 +3429,17 @@ components:
       - email
       - password1
       - password2
+    CustomLogin:
+      type: object
+      description: Custom login serializer to use email only and extract user info
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - password
     CustomLoginRequest:
       type: object
       description: Custom login serializer to use email only and extract user info
@@ -2975,6 +3577,15 @@ components:
         refresh:
           type: string
           minLength: 1
+    HVTPasswordReset:
+      type: object
+      description: Password reset serializer that emits frontend reset links.
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
     HVTPasswordResetRequest:
       type: object
       description: Password reset serializer that emits frontend reset links.
@@ -2993,20 +3604,6 @@ components:
       description: |-
         * `admin` - Admin
         * `member` - Member
-    JWT:
-      type: object
-      description: Serializer for JWT authentication.
-      properties:
-        access:
-          type: string
-        refresh:
-          type: string
-        user:
-          $ref: '#/components/schemas/UserDetails'
-      required:
-      - access
-      - refresh
-      - user
     Organization:
       type: object
       description: Serializer for organization Model
@@ -3059,6 +3656,24 @@ components:
           allOf:
           - $ref: '#/components/schemas/InvitationRoleEnum'
           readOnly: true
+        project:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        project_name:
+          type: string
+          readOnly: true
+          nullable: true
+        project_slug:
+          type: string
+          readOnly: true
+          nullable: true
+        app_roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRoleSummary'
+          readOnly: true
         status:
           type: string
           readOnly: true
@@ -3096,11 +3711,15 @@ components:
       - accept_url
       - accepted_at
       - accepted_by_email
+      - app_roles
       - created_at
       - email
       - expires_at
       - id
       - invited_by_email
+      - project
+      - project_name
+      - project_slug
       - revoked_at
       - role
       - status
@@ -3128,6 +3747,24 @@ components:
           maxLength: 254
         role:
           $ref: '#/components/schemas/InvitationRoleEnum'
+        project:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        project_name:
+          type: string
+          readOnly: true
+          nullable: true
+        project_slug:
+          type: string
+          readOnly: true
+          nullable: true
+        app_roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRoleSummary'
+          readOnly: true
         expires_at:
           type: string
           format: date-time
@@ -3141,9 +3778,13 @@ components:
           readOnly: true
       required:
       - accept_url
+      - app_roles
       - created_at
       - email
       - id
+      - project
+      - project_name
+      - project_slug
     OrganizationInvitationCreateRequest:
       type: object
       description: Create serializer for organization invitations.
@@ -3155,6 +3796,17 @@ components:
           maxLength: 254
         role:
           $ref: '#/components/schemas/InvitationRoleEnum'
+        project_id:
+          type: string
+          format: uuid
+          writeOnly: true
+          nullable: true
+        app_role_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          writeOnly: true
         expires_at:
           type: string
           format: date-time
@@ -3171,6 +3823,24 @@ components:
         role:
           allOf:
           - $ref: '#/components/schemas/InvitationRoleEnum'
+          readOnly: true
+        project:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        project_name:
+          type: string
+          readOnly: true
+          nullable: true
+        project_slug:
+          type: string
+          readOnly: true
+          nullable: true
+        app_roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRoleSummary'
           readOnly: true
         status:
           type: string
@@ -3205,12 +3875,16 @@ components:
           readOnly: true
       required:
       - accepted_at
+      - app_roles
       - created_at
       - email
       - expires_at
       - invited_by_email
       - organization_name
       - organization_slug
+      - project
+      - project_name
+      - project_slug
       - revoked_at
       - role
       - status
@@ -3426,6 +4100,46 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Project'
+    PaginatedProjectPermissionList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectPermission'
+    PaginatedProjectRoleList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRole'
     PaginatedSocialProviderConfigList:
       type: object
       properties:
@@ -3506,6 +4220,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Webhook'
+    PasswordChange:
+      type: object
+      properties:
+        new_password1:
+          type: string
+          maxLength: 128
+        new_password2:
+          type: string
+          maxLength: 128
+      required:
+      - new_password1
+      - new_password2
     PasswordChangeRequest:
       type: object
       properties:
@@ -3625,6 +4351,22 @@ components:
           type: string
           format: uuid
           nullable: true
+    PatchedProjectPermissionRequest:
+      type: object
+      description: Serializer for project-scoped app permissions.
+      properties:
+        slug:
+          type: string
+          minLength: 1
+          description: Stable permission identifier such as orders.read.own.
+          pattern: ^[a-z0-9]+(?:[._:-][a-z0-9]+)*$
+          maxLength: 100
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
     PatchedProjectRequest:
       type: object
       description: Serializer for organization projects.
@@ -3642,6 +4384,40 @@ components:
           type: boolean
         allow_signup:
           type: boolean
+    PatchedProjectRoleRequest:
+      type: object
+      description: Serializer for project-scoped roles and their attached permissions.
+      properties:
+        slug:
+          type: string
+          minLength: 1
+          description: Stable role identifier such as buyer or teacher.
+          pattern: ^[a-z0-9]+(?:[._:-][a-z0-9]+)*$
+          maxLength: 100
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+        is_default_signup:
+          type: boolean
+          description: Assign this role automatically during public runtime signup.
+        permission_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          writeOnly: true
+    PatchedProjectUserRoleAssignmentUpdateRequest:
+      type: object
+      description: Replace a user's role assignments for a single project.
+      properties:
+        role_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
     PatchedSocialProviderConfigRequest:
       type: object
       description: Serializer for per-project social provider configuration.
@@ -3752,6 +4528,62 @@ components:
       - name
       - slug
       - updated_at
+    ProjectPermission:
+      type: object
+      description: Serializer for project-scoped app permissions.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        project:
+          type: string
+          format: uuid
+          readOnly: true
+        slug:
+          type: string
+          description: Stable permission identifier such as orders.read.own.
+          pattern: ^[a-z0-9]+(?:[._:-][a-z0-9]+)*$
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 120
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - project
+      - slug
+      - updated_at
+    ProjectPermissionRequest:
+      type: object
+      description: Serializer for project-scoped app permissions.
+      properties:
+        slug:
+          type: string
+          minLength: 1
+          description: Stable permission identifier such as orders.read.own.
+          pattern: ^[a-z0-9]+(?:[._:-][a-z0-9]+)*$
+          maxLength: 100
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+      required:
+      - name
+      - slug
     ProjectRequest:
       type: object
       description: Serializer for organization projects.
@@ -3772,6 +4604,137 @@ components:
       required:
       - name
       - slug
+    ProjectRole:
+      type: object
+      description: Serializer for project-scoped roles and their attached permissions.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        project:
+          type: string
+          format: uuid
+          readOnly: true
+        slug:
+          type: string
+          description: Stable role identifier such as buyer or teacher.
+          pattern: ^[a-z0-9]+(?:[._:-][a-z0-9]+)*$
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 120
+        description:
+          type: string
+        is_default_signup:
+          type: boolean
+          description: Assign this role automatically during public runtime signup.
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectPermission'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - permissions
+      - project
+      - slug
+      - updated_at
+    ProjectRoleRequest:
+      type: object
+      description: Serializer for project-scoped roles and their attached permissions.
+      properties:
+        slug:
+          type: string
+          minLength: 1
+          description: Stable role identifier such as buyer or teacher.
+          pattern: ^[a-z0-9]+(?:[._:-][a-z0-9]+)*$
+          maxLength: 100
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+        is_default_signup:
+          type: boolean
+          description: Assign this role automatically during public runtime signup.
+        permission_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          writeOnly: true
+      required:
+      - name
+      - slug
+    ProjectRoleSummary:
+      type: object
+      description: Compact serializer for role assignments and access responses.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+          description: Stable role identifier such as buyer or teacher.
+        name:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - name
+      - slug
+    ProjectUserRoleAccess:
+      type: object
+      description: Read serializer for a user's project access view.
+      properties:
+        user:
+          type: string
+          format: uuid
+          readOnly: true
+        project:
+          type: string
+          format: uuid
+          readOnly: true
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRoleSummary'
+          readOnly: true
+        permissions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - permissions
+      - project
+      - roles
+      - user
+    ProjectUserRoleAssignmentUpdateRequest:
+      type: object
+      description: Replace a user's role assignments for a single project.
+      properties:
+        role_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+      - role_ids
     ProviderEnum:
       enum:
       - google
@@ -3780,6 +4743,14 @@ components:
       description: |-
         * `google` - Google
         * `github` - GitHub
+    ResendEmailVerification:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
     ResendEmailVerificationRequest:
       type: object
       properties:

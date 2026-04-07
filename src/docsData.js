@@ -19,6 +19,7 @@ export const SIDEBAR_SECTIONS = [
     items: [
       { title: 'Projects and API keys', path: '/guides/projects' },
       { title: 'Authentication flows', path: '/guides/auth' },
+      { title: 'Runtime roles and permissions', path: '/guides/runtime-roles' },
       { title: 'SDK usage', path: '/guides/sdk' },
       { title: 'Webhooks', path: '/guides/webhooks' },
       { title: 'Audit logs', path: '/guides/audit-logs' },
@@ -94,16 +95,39 @@ const hvt = new HVTClient({
     ],
     sample: {
       label: 'Runtime auth',
-      code: `await client.auth.register({
+      code: `await client.request('/api/v1/auth/runtime/register/', {
+  method: 'POST',
+  auth: 'apiKey',
+  body: {
   email: 'user@example.com',
   password1: 'Strongpass123!',
   password2: 'Strongpass123!'
+  }
 })
 
 await client.auth.runtimeLogin({
   email: 'user@example.com',
   password: 'Strongpass123!'
 })`,
+    },
+  },
+  '/guides/runtime-roles': {
+    anchors: [
+      { id: 'role-model', label: 'Keep the layers separate' },
+      { id: 'define-permissions', label: 'Define permissions first' },
+      { id: 'assign-roles', label: 'Choose assignment flow' },
+      { id: 'runtime-flow', label: 'Register and sign in runtime users' },
+      { id: 'read-access', label: 'Read live app access' },
+      { id: 'enforce-access', label: 'Enforce in the app' },
+      { id: 'common-pitfalls', label: 'Common mistakes' },
+    ],
+    sample: {
+      label: 'Enforcement rule',
+      code: `const canCheckout = permissions.includes('orders.create')
+
+if (!permissions.includes('orders.read.own')) {
+  return 403
+}`,
     },
   },
   '/guides/projects': {
@@ -186,7 +210,7 @@ await client.auth.runtimeLogin({
     ],
     sample: {
       label: 'Auth surface',
-      code: 'login, me, refresh, register, runtimeLogin, runtimeGoogle, runtimeGithub',
+      code: 'login, me, refresh, register, runtimeLogin, runtimeGoogle, runtimeGithub, request(/api/v1/auth/runtime/register/)',
     },
   },
   '/sdk/errors': {

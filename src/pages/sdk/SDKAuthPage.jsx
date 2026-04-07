@@ -7,10 +7,14 @@ await client.auth.updateMe({ first_name: 'Mark' })
 await client.auth.passwordReset({ email })
 await client.auth.passwordChange({ new_password1, new_password2 })`;
 
-const RUNTIME = `await client.auth.register({
-  email: 'user@example.com',
-  password1: 'Strongpass123!',
-  password2: 'Strongpass123!'
+const RUNTIME = `await client.request('/api/v1/auth/runtime/register/', {
+  method: 'POST',
+  auth: 'apiKey',
+  body: {
+    email: 'user@example.com',
+    password1: 'Strongpass123!',
+    password2: 'Strongpass123!'
+  }
 })
 
 await client.auth.runtimeLogin({
@@ -35,6 +39,10 @@ export default function SDKAuthPage() {
       </DocSection>
 
       <DocSection id="runtime-methods" title="Runtime methods">
+        <p>
+          The shipped SDK exposes runtime login and runtime social helpers. Runtime registration currently uses <strong>client.request(...)</strong> against <strong>/api/v1/auth/runtime/register/</strong>.
+        </p>
+        <div style={{ height: 16 }} />
         <CodeBlock code={RUNTIME} language="javascript" />
       </DocSection>
 
