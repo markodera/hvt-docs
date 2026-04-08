@@ -10,6 +10,47 @@
     />
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+    
+    <!-- Open Graph / Meta -->
+    <meta property="og:title" content="HVT - Documentation" />
+    <meta property="og:description" content="Official HVT documentation for projects, API keys, runtime authentication, app roles, webhooks, audit logs, and the SDK." />
+    <meta property="og:url" content="https://docs.hvts.app/" />
+    <meta property="og:image" content="https://docs.hvts.app/web-app-manifest-512x512.png" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVT - Documentation" />
+    <meta name="twitter:description" content="Official HVT documentation for projects, API keys, runtime authentication, app roles, webhooks, audit logs, and the SDK." />
+    <meta name="twitter:image" content="https://docs.hvts.app/web-app-manifest-512x512.png" />
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://hvts.app/#organization",
+          "name": "HVT",
+          "url": "https://hvts.app",
+          "logo": "https://docs.hvts.app/favicon.svg",
+          "description": "Open-source, self-hostable authentication platform and Auth0 alternative."
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://docs.hvts.app/#website",
+          "url": "https://docs.hvts.app",
+          "name": "HVT Documentation",
+          "description": "Official documentation for HVT. Learn about projects, API keys, runtime authentication, app roles, webhooks, audit logs, and the SDK.",
+          "publisher": {
+            "@id": "https://hvts.app/#organization"
+          }
+        }
+      ]
+    }
+    </script>
+
     <title>HVT - Documentation</title>
     <!-- Polyfills for Stoplight Elements -->
     <script>
