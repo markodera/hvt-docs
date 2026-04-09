@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useLocation, useOutletContext } from 'react-router-dom';
 
 import ApiNav from '../components/ApiNav';
+import PageSEO from '../components/PageSEO';
 import { EXTERNAL_LINKS, SIDEBAR_SECTIONS, getPageMeta } from '../docsData';
 
 function filterSections(sections, query, isApiPage) {
@@ -260,6 +261,7 @@ export default function DocsLayout() {
 
   return (
     <div className="docs-shell-bg" style={{ minHeight: 'calc(100dvh - var(--topbar-height))', color: '#ffffff' }}>
+      <PageSEO />
       {mobileSidebarOpen ? <div className="docs-mobile-overlay" onClick={() => setMobileSidebarOpen(false)} /> : null}
 
       <aside
