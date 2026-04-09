@@ -231,3 +231,143 @@ if (!permissions.includes('orders.read.own')) {
 export function getPageMeta(pathname) {
   return PAGE_META[pathname] ?? { anchors: [], sample: null };
 }
+
+export const SEO_META = {
+  '/introduction': {
+    title: 'What is HVT? – HVT Documentation',
+    description:
+      'Learn what HVT is: open-source authentication infrastructure for projects, API keys, runtime auth, and webhooks. Self-host or use hvts.app.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'What is HVT?', item: 'https://docs.hvts.app/introduction' },
+    ],
+  },
+  '/quickstart': {
+    title: 'Quickstart – HVT Authentication',
+    description:
+      'Go from a new HVT account to a working user signup and login flow in minutes. Create an organisation, project, and API key, then wire up the SDK.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Quickstart', item: 'https://docs.hvts.app/quickstart' },
+    ],
+  },
+  '/concepts': {
+    title: 'How HVT Is Structured – HVT Documentation',
+    description:
+      'Understand the core building blocks of HVT: organisations, projects, API keys, and the end-to-end request flow.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'How HVT Is Structured', item: 'https://docs.hvts.app/concepts' },
+    ],
+  },
+  '/guides/auth': {
+    title: 'Authentication Flows – HVT Guides',
+    description:
+      'Set up dashboard sign-in, runtime user registration and login, social OAuth (Google, GitHub), token refresh, and logout with HVT.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/auth' },
+      { name: 'Authentication Flows', item: 'https://docs.hvts.app/guides/auth' },
+    ],
+  },
+  '/guides/projects': {
+    title: 'Projects & API Keys – HVT Guides',
+    description:
+      'Create HVT projects, issue scoped API keys, and configure social providers for each app environment.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/projects' },
+      { name: 'Projects & API Keys', item: 'https://docs.hvts.app/guides/projects' },
+    ],
+  },
+  '/guides/runtime-roles': {
+    title: 'Runtime Roles & Permissions – HVT Guides',
+    description:
+      'Define permissions, assign runtime roles to users, and enforce role-based access control in your app with HVT.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/runtime-roles' },
+      { name: 'Runtime Roles & Permissions', item: 'https://docs.hvts.app/guides/runtime-roles' },
+    ],
+  },
+  '/guides/sdk': {
+    title: 'SDK Usage – HVT Guides',
+    description:
+      'Install and initialise the HVT SDK, call auth methods, manage API keys and webhooks, and handle errors in your app.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/sdk' },
+      { name: 'SDK Usage', item: 'https://docs.hvts.app/guides/sdk' },
+    ],
+  },
+  '/guides/webhooks': {
+    title: 'Webhooks – HVT Guides',
+    description:
+      'Create webhook endpoints, handle deliveries and retries, verify HMAC signatures, and browse the full event catalogue in HVT.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/webhooks' },
+      { name: 'Webhooks', item: 'https://docs.hvts.app/guides/webhooks' },
+    ],
+  },
+  '/guides/audit-logs': {
+    title: 'Audit Logs – HVT Guides',
+    description:
+      'View and filter the full audit trail of authentication events across your HVT organisation and projects.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/audit-logs' },
+      { name: 'Audit Logs', item: 'https://docs.hvts.app/guides/audit-logs' },
+    ],
+  },
+  '/api': {
+    title: 'API Reference – HVT Documentation',
+    description:
+      'Browse every HVT REST API endpoint for authentication, projects, users, API keys, webhooks, and audit logs.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'API Reference', item: 'https://docs.hvts.app/api' },
+    ],
+  },
+  '/sdk/hvtclient': {
+    title: 'HVTClient – SDK Reference',
+    description:
+      'Construct and configure the HVTClient to access auth, organisations, and user method groups in the HVT SDK.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'SDK Reference', item: 'https://docs.hvts.app/sdk/hvtclient' },
+      { name: 'HVTClient', item: 'https://docs.hvts.app/sdk/hvtclient' },
+    ],
+  },
+  '/sdk/auth': {
+    title: 'auth methods – SDK Reference',
+    description:
+      'Full reference for HVT SDK auth methods: login, register, runtimeLogin, token refresh, social auth (Google, GitHub), and more.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'SDK Reference', item: 'https://docs.hvts.app/sdk/auth' },
+      { name: 'auth methods', item: 'https://docs.hvts.app/sdk/auth' },
+    ],
+  },
+  '/sdk/errors': {
+    title: 'Error Handling – SDK Reference',
+    description:
+      'Understand HVTApiError, the error envelope structure, and how to handle authentication errors in the HVT SDK.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'SDK Reference', item: 'https://docs.hvts.app/sdk/errors' },
+      { name: 'Error Handling', item: 'https://docs.hvts.app/sdk/errors' },
+    ],
+  },
+};
+
+export function getSeoMeta(pathname) {
+  return (
+    SEO_META[pathname] ?? {
+      title: 'HVT Documentation',
+      description:
+        'Official HVT documentation for projects, API keys, runtime authentication, app roles, webhooks, audit logs, and the SDK.',
+      breadcrumbs: [{ name: 'HVT Documentation', item: 'https://docs.hvts.app/' }],
+    }
+  );
+}
