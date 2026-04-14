@@ -17,6 +17,7 @@ export const SIDEBAR_SECTIONS = [
   {
     label: 'MOST COMMON TASKS',
     items: [
+      { title: 'Integration Guide', path: '/guides/integration' },
       { title: 'Projects and API keys', path: '/guides/projects' },
       { title: 'Authentication flows', path: '/guides/auth' },
       { title: 'Runtime roles and permissions', path: '/guides/runtime-roles' },
