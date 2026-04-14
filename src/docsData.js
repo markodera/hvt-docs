@@ -66,7 +66,7 @@ export const PAGE_META = {
     ],
     sample: {
       label: 'Runtime client',
-      code: `import { HVTClient } from 'hvt-sdk'
+      code: `import { HVTClient } from '@hvt/sdk'
 
 const hvt = new HVTClient({
   baseUrl: 'https://hvts.app',

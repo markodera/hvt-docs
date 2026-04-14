@@ -2,9 +2,9 @@
 import CodeBlock from '../../components/CodeBlock';
 import Callout from '../../components/Callout';
 
-const INSTALL = `npm install hvt-sdk`;
+const INSTALL = `npm install @hvt/sdk`;
 
-const INIT = `import { HVTApiError, HVTClient } from 'hvt-sdk'
+const INIT = `import { HVTApiError, HVTClient } from '@hvt/sdk'
 
 export const hvt = new HVTClient({
   baseUrl: import.meta.env.VITE_API_URL,
@@ -53,7 +53,7 @@ await hvt.organizations.updateWebhook(webhookId, {
 })
 await hvt.organizations.deleteWebhook(webhookId)`;
 
-const ERROR_HANDLING = `import { HVTApiError } from 'hvt-sdk'
+const ERROR_HANDLING = `import { HVTApiError } from '@hvt/sdk'
 
 try {
   await hvt.auth.runtimeLogin({

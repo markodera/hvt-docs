@@ -2,9 +2,9 @@ import DocPage, { DocSection } from '../components/DocPage';
 import Callout from '../components/Callout';
 import CodeBlock from '../components/CodeBlock';
 
-const INSTALL_CODE = `npm install hvt-sdk`;
+const INSTALL_CODE = `npm install @hvt/sdk`;
 
-const INIT_CODE = `import { HVTClient } from 'hvt-sdk'
+const INIT_CODE = `import { HVTClient } from '@hvt/sdk'
 
 const hvt = new HVTClient({
   baseUrl: 'https://hvts.app',

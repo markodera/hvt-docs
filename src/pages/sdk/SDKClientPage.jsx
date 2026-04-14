@@ -1,7 +1,7 @@
 import DocPage, { DocSection } from '../../components/DocPage';
 import CodeBlock from '../../components/CodeBlock';
 
-const CLIENT = `import { HVTClient } from 'hvt-sdk'
+const CLIENT = `import { HVTClient } from '@hvt/sdk'
 
 const client = new HVTClient({
   baseUrl: 'https://hvts.app',
