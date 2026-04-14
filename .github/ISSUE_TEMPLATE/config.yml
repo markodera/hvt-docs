@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/markodera/hvt-docs/security/advisories/new
+    about: Report security issues privately instead of using public issues.
+  - name: Published documentation
+    url: https://docs.hvts.app/
+    about: Check the live docs site before filing a docs-site issue.

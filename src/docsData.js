@@ -1,6 +1,6 @@
 ﻿export const EXTERNAL_LINKS = {
   app: 'https://hvts.app',
-  github: 'https://github.com/markodera/hvt',
+  github: 'https://github.com/markodera/hvt-docs',
   status: 'https://hvts.app/healthz/',
   schema: import.meta.env.VITE_API_SCHEMA_URL ?? '/schema.yaml',
 };

@@ -1,7 +1,27 @@
 {
   "name": "hvt-docs",
-  "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Official documentation site for HVT.",
+  "homepage": "https://docs.hvts.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markodera/hvt-docs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/markodera/hvt-docs/issues"
+  },
+  "keywords": [
+    "hvt",
+    "docs",
+    "documentation",
+    "react",
+    "vite",
+    "openapi"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

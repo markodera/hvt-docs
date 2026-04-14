@@ -7,13 +7,22 @@ import { HvtLogoMark } from './Logo';
 
 export default function TopNav() {
   const location = useLocation();
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const locationKey = location.key ?? `${location.pathname}${location.hash}`;
+  const [mobileSidebarState, setMobileSidebarState] = useState({ open: false, locationKey });
   const [searchTerm, setSearchTerm] = useState('');
   const isApiPage = location.pathname.startsWith('/api');
+  const mobileSidebarOpen = mobileSidebarState.open && mobileSidebarState.locationKey === locationKey;
+  const setMobileSidebarOpen = (value) => {
+    setMobileSidebarState((previous) => {
+      const previousOpen = previous.open && previous.locationKey === locationKey;
+      const nextOpen = typeof value === 'function' ? value(previousOpen) : value;
 
-  useEffect(() => {
-    setMobileSidebarOpen(false);
-  }, [location.pathname, location.hash]);
+      return {
+        open: nextOpen,
+        locationKey,
+      };
+    });
+  };
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;

@@ -4,6 +4,10 @@ import { NavLink, Outlet, useLocation, useOutletContext } from 'react-router-dom
 import ApiNav from '../components/ApiNav';
 import { EXTERNAL_LINKS, SIDEBAR_SECTIONS, getPageMeta } from '../docsData';
 
+function isReferenceSection(section) {
+  return section.items.some((item) => item.path === '/api');
+}
+
 function filterSections(sections, query, isApiPage) {
   const value = query.trim().toLowerCase();
 
@@ -13,7 +17,7 @@ function filterSections(sections, query, isApiPage) {
 
   return sections
     .map((section) => {
-      if (isApiPage && section.label === 'API REFERENCE') {
+      if (isApiPage && isReferenceSection(section)) {
         return section;
       }
 
@@ -22,7 +26,7 @@ function filterSections(sections, query, isApiPage) {
         items: section.items.filter((item) => item.title.toLowerCase().includes(value)),
       };
     })
-    .filter((section) => section.items.length > 0 || (isApiPage && section.label === 'API REFERENCE'));
+    .filter((section) => section.items.length > 0 || (isApiPage && isReferenceSection(section)));
 }
 
 function NavSection({ label, children }) {
@@ -183,15 +187,6 @@ export default function DocsLayout() {
   const filteredSections = useMemo(() => filterSections(SIDEBAR_SECTIONS, searchTerm, isApiPage), [searchTerm, isApiPage]);
 
   useEffect(() => {
-    if (!isApiPage) {
-      setActiveAnchor('');
-      return;
-    }
-
-    setActiveAnchor(location.hash || '');
-  }, [isApiPage, location.hash]);
-
-  useEffect(() => {
     if (!isApiPage || !location.hash) {
       return undefined;
     }
@@ -288,7 +283,7 @@ export default function DocsLayout() {
                     {item.title}
                   </NavItem>
                 ))}
-                {isApiPage && section.label === 'API REFERENCE' ? (
+                {isApiPage && isReferenceSection(section) ? (
                   <div style={{ marginTop: '8px' }}>
                     <ApiNav activeAnchor={activeAnchor} onNavigate={setActiveAnchor} searchTerm={searchTerm} />
                   </div>
