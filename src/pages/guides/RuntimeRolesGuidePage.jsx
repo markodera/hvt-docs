@@ -162,7 +162,24 @@ export default function RuntimeRolesGuidePage() {
         <CodeBlock code={SERVER_GATING} language="python" />
       </DocSection>
 
-      <DocSection id="common-pitfalls" title="7. Common mistakes">
+      <DocSection id="runtime-playground-and-demo" title="7. Runtime Playground and Demo">
+        <p>
+          Test your roles and permissions instantly using our built-in tooling, without needing to build a custom test application.
+        </p>
+        <ul>
+          <li>
+            <strong>Runtime Playground:</strong> Access the <a href="https://hvts.app/runtime-playground" target="_blank" rel="noreferrer" style={{ color: '#a855f7', fontWeight: 700, textDecoration: 'underline' }}>Runtime Playground</a> directly from the dashboard sidebar to issue test tokens and simulate various user contexts and roles.
+          </li>
+          <li>
+            <strong>Role Sandbox Demo:</strong> The dashboard acts as your Identity Provider (IdP), while the <a href="https://hvts.app/runtime-demo" target="_blank" rel="noreferrer" style={{ color: '#a855f7', fontWeight: 700, textDecoration: 'underline' }}>Role Sandbox Demo</a> serves as the Relying Party. Generate a token in the Playground, then click "Open Roles Demo &rarr;" to test your configuration.
+          </li>
+          <li>
+            <strong>Dynamic Permission Rendering:</strong> The Demo application automatically decodes the token and renders UI components based on the user's RBAC matrix. It evaluates the permissions array in real-time, displaying active feature blocks (e.g., <strong>Feature: {'{slug}'}</strong>) to verify your access controls.
+          </li>
+        </ul>
+      </DocSection>
+
+      <DocSection id="common-pitfalls" title="8. Common mistakes">
         <ul>
           <li>Using <strong>/api/v1/auth/register/</strong> for runtime users instead of <strong>/api/v1/auth/runtime/register/</strong>.</li>
           <li>Checking <strong>role === 'seller'</strong> instead of checking permission slugs.</li>
