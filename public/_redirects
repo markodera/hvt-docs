@@ -1,1 +1,12 @@
-﻿/* /index.html 200
+﻿# Root canonical
+/ /introduction 301!
+
+# Remove trailing slash duplicates
+/introduction/ /introduction 301!
+/quickstart/ /quickstart 301!
+/concepts/ /concepts 301!
+/guides/:splat/ /guides/:splat 301!
+/sdk/:splat/ /sdk/:splat 301!
+/api/ /api 301!
+
+/* /index.html 200

@@ -6,7 +6,13 @@
   "cleanUrls": false,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/", "destination": "/introduction", "permanent": true }
+    { "source": "/", "destination": "/introduction", "permanent": true },
+    { "source": "/introduction/", "destination": "/introduction", "permanent": true },
+    { "source": "/quickstart/", "destination": "/quickstart", "permanent": true },
+    { "source": "/concepts/", "destination": "/concepts", "permanent": true },
+    { "source": "/guides/:slug+/", "destination": "/guides/:slug", "permanent": true },
+    { "source": "/sdk/:slug+/", "destination": "/sdk/:slug", "permanent": true },
+    { "source": "/api/", "destination": "/api", "permanent": true }
   ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }

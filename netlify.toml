@@ -3,6 +3,48 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/"
+  to = "/introduction"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/introduction/"
+  to = "/introduction"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/quickstart/"
+  to = "/quickstart"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/concepts/"
+  to = "/concepts"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/:slug/"
+  to = "/guides/:slug"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/sdk/:slug/"
+  to = "/sdk/:slug"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/api/"
+  to = "/api"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
