@@ -37,7 +37,7 @@ All environment variables are optional. Copy `.env.example` to `.env` only if yo
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `VITE_API_SCHEMA_URL` | `/schema.yaml` | Path or URL for the OpenAPI schema used by the API reference. |
-| `VITE_API_URL` | `https://hvts.app` | Base URL shown in SDK examples. |
+| `VITE_API_URL` | `https://api.hvts.app` | Base URL shown in SDK examples. |
 | `VITE_HVT_API_KEY` | unset | Example API key shown in SDK examples. |
 
 ## Refreshing the API Schema

@@ -4,6 +4,7 @@ Official documentation for HVT, the auth and access platform behind hvts.app.
 
 Primary docs site: https://docs.hvts.app/
 Primary app: https://hvts.app/
+Direct API base: https://api.hvts.app/
 OpenAPI schema: https://docs.hvts.app/schema.yaml
 Sitemap: https://docs.hvts.app/sitemap.xml
 
@@ -30,3 +31,5 @@ Sitemap: https://docs.hvts.app/sitemap.xml
 - HVT separates platform administration, control-plane organization roles, and project-scoped app roles.
 - Runtime access should be enforced by permission slug plus record scope, not by role name alone.
 - Runtime sign-up uses /api/v1/auth/runtime/register/ and control-plane sign-up uses /api/v1/auth/register/.
+- Managed-service API calls should target https://api.hvts.app, not https://hvts.app.
+- Browser runtime auth policy: test keys allow localhost for local development; live keys require the request origin to match the project's runtime frontend URL or configured allowed origins.

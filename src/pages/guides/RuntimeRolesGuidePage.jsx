@@ -35,7 +35,7 @@ const ROLES = `[
 ]`;
 
 const RUNTIME_REGISTER = `const client = new HVTClient({
-  baseUrl: 'https://api.example.com',
+  baseUrl: 'https://api.hvts.app',
   apiKey: 'hvt_test_...',
   credentials: 'omit'
 })
@@ -58,7 +58,7 @@ const session = await client.auth.runtimeLogin({
 })`;
 
 const ACCESS_LOOKUP = `const runtimeClient = new HVTClient({
-  baseUrl: 'https://api.example.com',
+  baseUrl: 'https://api.hvts.app',
   accessToken: session.access,
   credentials: 'omit'
 })
@@ -135,7 +135,7 @@ export default function RuntimeRolesGuidePage() {
         <CodeBlock code={RUNTIME_REGISTER} language="javascript" />
         <div style={{ height: 16 }} />
         <Callout type="info" title="Browser testing">
-          Internal browser playgrounds should use <strong>credentials: 'omit'</strong> so runtime test tokens do not overwrite the dashboard cookie session.
+          Internal browser playgrounds should use <strong>credentials: 'omit'</strong> so runtime test tokens do not overwrite the dashboard cookie session. Test keys allow localhost browser origins automatically. Live browser apps need the project&rsquo;s runtime frontend URL and allowed origins configured first.
         </Callout>
       </DocSection>
 

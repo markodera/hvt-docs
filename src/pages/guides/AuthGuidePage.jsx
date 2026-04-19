@@ -67,6 +67,10 @@ export default function AuthGuidePage() {
         </p>
         <CodeBlock code={RUNTIME} language="javascript" />
         <div style={{ height: 16 }} />
+        <Callout type="warning" title="Managed-service browser rule">
+          Managed-service runtime requests should go to <strong>https://api.hvts.app</strong>. For browser apps, <strong>hvt_test_*</strong> keys allow localhost during local development, while <strong>hvt_live_*</strong> keys require the request origin to match the project&rsquo;s runtime frontend URL or configured allowed origins.
+        </Callout>
+        <div style={{ height: 16 }} />
         <p>
           Public signup can attach one or more default project roles automatically. Higher-privilege app roles usually come from an invitation or from an owner/admin assigning roles later in the dashboard.
         </p>

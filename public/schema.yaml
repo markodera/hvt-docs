@@ -4513,6 +4513,15 @@ components:
           type: boolean
         allow_signup:
           type: boolean
+        frontend_url:
+          type: string
+          format: uri
+          maxLength: 500
+        allowed_origins:
+          type: array
+          items:
+            type: string
+            maxLength: 500
         created_at:
           type: string
           format: date-time
@@ -4601,6 +4610,16 @@ components:
           type: boolean
         allow_signup:
           type: boolean
+        frontend_url:
+          type: string
+          format: uri
+          minLength: 1
+          maxLength: 500
+        allowed_origins:
+          type: array
+          items:
+            type: string
+            maxLength: 500
       required:
       - name
       - slug

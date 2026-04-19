@@ -4,7 +4,7 @@ import CodeBlock from '../../components/CodeBlock';
 const CLIENT = `import { HVTClient } from '@hvt/sdk'
 
 const client = new HVTClient({
-  baseUrl: 'https://hvts.app',
+  baseUrl: 'https://api.hvts.app',
   apiKey: 'hvt_live_...',
   credentials: 'include'
 })`;
@@ -18,6 +18,10 @@ export default function SDKClientPage() {
     >
       <DocSection id="constructing-the-client" title="Constructing the client">
         <CodeBlock code={CLIENT} language="javascript" />
+        <div style={{ height: 16 }} />
+        <p>
+          On the managed service, always use <code className="font-code">https://api.hvts.app</code> as the client base URL.
+        </p>
       </DocSection>
 
       <DocSection id="auth-groups" title="Client groups">

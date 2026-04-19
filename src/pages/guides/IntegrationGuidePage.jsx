@@ -4,13 +4,26 @@ import Callout from '../../components/Callout';
 
 const BASIC_USAGE = `import { HVTClient } from '@hvt/sdk';
 
-const auth = new HVTClient({
-  projectId: "YOUR_PROJECT_ID",
-  apiKey: "YOUR_API_KEY"
+const client = new HVTClient({
+  baseUrl: 'https://api.hvts.app',
+  apiKey: 'hvt_test_your_project_key',
+  credentials: 'omit'
 });
 
-// Auto-handles hitting the \`/runtime/\` endpoints and token persistence
-const user = await auth.login({ email, password });`;
+await client.request('/api/v1/auth/runtime/register/', {
+  method: 'POST',
+  auth: 'apiKey',
+  body: {
+    email: 'user@example.com',
+    password1: 'Strongpass123!',
+    password2: 'Strongpass123!'
+  }
+});
+
+const session = await client.auth.runtimeLogin({
+  email: 'user@example.com',
+  password: 'Strongpass123!'
+});`;
 
 const REQUIRED_HEADER = `X-API-Key: <YOUR_PROJECT_API_KEY>`;
 
@@ -102,7 +115,14 @@ export default function IntegrationGuidePage() {
         <CodeBlock code={REQUIRED_HEADER} language="http" />
 
         <h3 style={{ fontSize: '18px', fontWeight: '600', marginTop: '32px', marginBottom: '16px' }}>Complete Runtime URL Reference</h3>
-        <p style={{ marginBottom: '24px' }}>Base URL (assuming local development): <code>http://localhost:8000/api/v1/auth</code></p>
+        <p style={{ marginBottom: '24px' }}>Managed service base URL: <code>https://api.hvts.app/api/v1/auth</code>. Local development base URL: <code>http://localhost:8000/api/v1/auth</code>.</p>
+        <Callout type="warning" title="Do not use the site origin as the API origin">
+          If you are using the managed service, send runtime requests to <code>https://api.hvts.app</code>, not <code>https://hvts.app</code>.
+        </Callout>
+        <div style={{ height: '16px' }} />
+        <Callout type="info" title="Browser CORS policy">
+          Browser-based runtime auth is allowed from localhost automatically when you use a <code>hvt_test_*</code> key. Live keys require the browser origin to match the project&apos;s runtime frontend URL or configured allowed origins.
+        </Callout>
 
         <h4 style={{ fontSize: '16px', fontWeight: '600', marginTop: '24px', marginBottom: '8px', color: '#fff' }}>Registration &amp; Verification</h4>
         

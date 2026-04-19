@@ -7,7 +7,7 @@ const INSTALL = `npm install @hvt/sdk`;
 const INIT = `import { HVTApiError, HVTClient } from '@hvt/sdk'
 
 export const hvt = new HVTClient({
-  baseUrl: import.meta.env.VITE_API_URL,
+  baseUrl: import.meta.env.VITE_API_URL || 'https://api.hvts.app',
   apiKey: import.meta.env.VITE_HVT_API_KEY,
 })
 
@@ -85,6 +85,10 @@ export default function SDKGuidePage() {
           Instantiate the HVT client once, export it, and import that shared instance everywhere else. Do not create a new client inside each component or request handler.
         </p>
         <CodeBlock code={INIT} language="javascript" />
+        <div style={{ height: 16 }} />
+        <Callout type="warning" title="Managed-service base URL">
+          Use <strong>https://api.hvts.app</strong> for managed-service SDK traffic. <strong>https://hvts.app</strong> is the site origin, not the API origin.
+        </Callout>
       </DocSection>
 
       <DocSection id="auth-methods" title="3. Most-used auth methods">
@@ -122,4 +126,3 @@ export default function SDKGuidePage() {
     </DocPage>
   );
 }
-

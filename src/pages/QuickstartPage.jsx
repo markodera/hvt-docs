@@ -7,7 +7,7 @@ const INSTALL_CODE = `npm install @hvt/sdk`;
 const INIT_CODE = `import { HVTClient } from '@hvt/sdk'
 
 const hvt = new HVTClient({
-  baseUrl: 'https://hvts.app',
+  baseUrl: 'https://api.hvts.app',
   apiKey: 'hvt_live_...'
 })`;
 
@@ -63,6 +63,9 @@ export default function QuickstartPage() {
         <p>
           That same project can also hold the dynamic app roles and permissions for your runtime users, such as <strong>buyer</strong>, <strong>seller</strong>, or <strong>teacher</strong>.
         </p>
+        <p>
+          If this project will back a browser app, set its <strong>Runtime frontend URL</strong> and any extra <strong>Allowed origins</strong>. HVT uses those values to decide which browser origins may call runtime auth for live keys.
+        </p>
       </DocSection>
 
       <DocSection id="issue-api-key" title="4. Issue an API key">
@@ -71,6 +74,10 @@ export default function QuickstartPage() {
         </p>
         <Callout type="tip" title="Required scope">
           Your API key must have <strong>auth:runtime</strong> scope. Runtime register, runtime login, and runtime social auth return <strong>403</strong> without it.
+        </Callout>
+        <div style={{ height: 16 }} />
+        <Callout type="info" title="Test keys vs live keys in browsers">
+          <strong>hvt_test_*</strong> keys automatically allow localhost browser origins for local development. <strong>hvt_live_*</strong> keys do not. For live browser apps, add the exact origin to the project&rsquo;s <strong>Allowed origins</strong> list or use the project&rsquo;s <strong>Runtime frontend URL</strong>.
         </Callout>
       </DocSection>
 
@@ -83,6 +90,10 @@ export default function QuickstartPage() {
           Create one HVT client and reuse it everywhere in your app. The API key tells HVT which project the runtime requests belong to.
         </p>
         <CodeBlock code={INIT_CODE} language="javascript" />
+        <div style={{ height: 16 }} />
+        <Callout type="warning" title="Use the API host">
+          On the managed service, runtime and SDK traffic should go to <strong>https://api.hvts.app</strong>. Do not send API requests to <strong>https://hvts.app</strong>.
+        </Callout>
         <div style={{ height: 16 }} />
         <Callout type="info" title="Simple rule to remember">
           The API key identifies the app boundary. The user token identifies the person inside that boundary.

@@ -49,6 +49,10 @@ export default function SDKAuthPage() {
         </p>
         <div style={{ height: 16 }} />
         <CodeBlock code={RUNTIME} language="javascript" />
+        <div style={{ height: 16 }} />
+        <Callout type="info" title="Runtime browser origin policy">
+          Local browser development works best with <strong>hvt_test_*</strong> keys because localhost origins are allowed automatically. Live browser apps must use a project whose runtime frontend URL and allowed origins match the actual request origin.
+        </Callout>
       </DocSection>
 
       <DocSection id="social-methods" title="Social methods">

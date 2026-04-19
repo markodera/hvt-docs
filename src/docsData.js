@@ -1,7 +1,7 @@
 ﻿export const EXTERNAL_LINKS = {
   app: 'https://hvts.app',
   github: 'https://github.com/markodera/hvt-docs',
-  status: 'https://hvts.app/healthz/',
+  status: 'https://api.hvts.app/healthz/',
   schema: import.meta.env.VITE_API_SCHEMA_URL ?? '/schema.yaml',
 };
 
@@ -70,7 +70,7 @@ export const PAGE_META = {
       code: `import { HVTClient } from '@hvt/sdk'
 
 const hvt = new HVTClient({
-  baseUrl: 'https://hvts.app',
+  baseUrl: 'https://api.hvts.app',
   apiKey: 'hvt_live_...'
 })`,
     },

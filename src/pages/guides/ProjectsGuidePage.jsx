@@ -5,7 +5,12 @@ import CodeBlock from '../../components/CodeBlock';
 const CREATE_PROJECT = `await client.organizations.createProject({
   name: 'Storefront production',
   slug: 'storefront-prod',
-  allow_signup: true
+  allow_signup: true,
+  frontend_url: 'https://app.example.com',
+  allowed_origins: [
+    'https://preview.example.com',
+    'http://localhost:3000'
+  ]
 })`;
 
 const ISSUE_KEY = `await client.organizations.createApiKey({
@@ -60,6 +65,10 @@ export default function ProjectsGuidePage() {
           Create the project first. It gives HVT a place to attach runtime users, social providers, default signup roles, and the dynamic permission model for that app.
         </p>
         <CodeBlock code={CREATE_PROJECT} language="javascript" />
+        <div style={{ height: 16 }} />
+        <Callout type="info" title="Browser origin policy for runtime auth">
+          HVT uses project settings for browser runtime auth. <strong>frontend_url</strong> is treated as an allowed runtime origin automatically, and <strong>allowed_origins</strong> lets you add preview, staging, or localhost browser origins explicitly for live keys.
+        </Callout>
       </DocSection>
 
       <DocSection id="issue-api-key" title="3. Issue a project key">
@@ -67,6 +76,10 @@ export default function ProjectsGuidePage() {
           API keys are created from the organisation methods in the SDK, but the key itself should target a specific project. The key identifies the calling app. It does not identify a person.
         </p>
         <CodeBlock code={ISSUE_KEY} language="javascript" />
+        <div style={{ height: 16 }} />
+        <p>
+          Use <strong>test</strong> keys for local development and playground work. Test keys allow localhost browser origins automatically. Use <strong>live</strong> keys for production traffic only after the project&rsquo;s runtime frontend URL and allowed origins are configured correctly.
+        </p>
         <div style={{ height: 16 }} />
         <p>
           After the project exists, define its permission slugs and bundle them into app roles. Those records are customer-defined data, not hard-coded HVT enums.
