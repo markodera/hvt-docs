@@ -77,6 +77,7 @@ export default function IntegrationGuidePage() {
     <DocPage
       title="HVT Integration Guide"
       subtitle="HVT operates on two planes: the Control Plane (for your developer administration) and the Runtime Plane (for end-user authentication). This document focuses entirely on integrating your application with the Runtime Plane."
+      next={{ href: '/guides/tenant-isolation', label: 'Tenant Isolation' }}
     >
       <div style={{ marginBottom: '24px' }}>
         <p>Two approaches exist for integration:</p>

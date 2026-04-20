@@ -12,6 +12,7 @@ import IntegrationGuidePage from './pages/guides/IntegrationGuidePage';
 import ProjectsGuidePage from './pages/guides/ProjectsGuidePage';
 import RuntimeRolesGuidePage from './pages/guides/RuntimeRolesGuidePage';
 import SDKGuidePage from './pages/guides/SDKGuidePage';
+import TenantIsolationGuidePage from './pages/guides/TenantIsolationGuidePage';
 import WebhooksGuidePage from './pages/guides/WebhooksGuidePage';
 import SDKAuthPage from './pages/sdk/SDKAuthPage';
 import SDKClientPage from './pages/sdk/SDKClientPage';
@@ -55,6 +56,7 @@ const docsRoutes = [
   { path: 'introduction', element: <IntroductionPage /> },
   { path: 'quickstart', element: <QuickstartPage /> },
   { path: 'concepts', element: <ConceptsPage /> },
+  { path: 'guides/tenant-isolation', element: <TenantIsolationGuidePage /> },
   { path: 'guides/auth', element: <AuthGuidePage /> },
   { path: 'guides/integration', element: <IntegrationGuidePage /> },
   { path: 'guides/projects', element: <ProjectsGuidePage /> },

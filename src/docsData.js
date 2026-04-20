@@ -18,6 +18,7 @@ export const SIDEBAR_SECTIONS = [
     label: 'MOST COMMON TASKS',
     items: [
       { title: 'Integration Guide', path: '/guides/integration' },
+      { title: 'Tenant Isolation', path: '/guides/tenant-isolation' },
       { title: 'Projects and API keys', path: '/guides/projects' },
       { title: 'Authentication flows', path: '/guides/auth' },
       { title: 'Runtime roles and permissions', path: '/guides/runtime-roles' },
@@ -85,6 +86,20 @@ const hvt = new HVTClient({
     sample: {
       label: 'Credential rule',
       code: 'API key = app boundary. Token = user identity inside that boundary.',
+    },
+  },
+  '/guides/tenant-isolation': {
+    anchors: [
+      { id: 'core-problem', label: 'The Global Email Constraint' },
+      { id: 'two-plane-isolation', label: 'Two-Plane Isolation' },
+      { id: 'backward-compatibility', label: 'Backward Compatibility' },
+    ],
+    sample: {
+      label: 'PostgreSQL DB Constraints',
+      code: `models.UniqueConstraint(
+    fields=["email", "project"],
+    name="uniq_user_email_per_project",
+)`,
     },
   },
   '/guides/auth': {

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useLocation, useOutletContext } from 'react-router-dom';
+import { ArrowUp } from 'lucide-react';
 
 import ApiNav from '../components/ApiNav';
 import PageSEO from '../components/PageSEO';
@@ -184,8 +185,23 @@ export default function DocsLayout() {
   const setMobileSidebarOpen = outletContext.setMobileSidebarOpen ?? (() => {});
   const searchTerm = outletContext.searchTerm ?? '';
   const [activeAnchor, setActiveAnchor] = useState(location.hash || '');
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const filteredSections = useMemo(() => filterSections(SIDEBAR_SECTIONS, searchTerm, isApiPage), [searchTerm, isApiPage]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!location.hash) {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, location.hash]);
 
   useEffect(() => {
     if (!isApiPage || !location.hash) {
@@ -321,6 +337,36 @@ export default function DocsLayout() {
           </div>
         </div>
       </aside>
+
+      {showBackToTop ? (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: isApiPage ? 'calc(var(--right-panel-width) + 24px)' : '24px',
+            zIndex: 50,
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            background: '#7c3aed',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'background 0.2s',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = '#6d28d9')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = '#7c3aed')}
+          aria-label="Back to top"
+        >
+          <ArrowUp size={20} />
+        </button>
+      ) : null}
 
       <main
         className={`docs-scroll content-area${isApiPage ? ' api-page' : ''}`}

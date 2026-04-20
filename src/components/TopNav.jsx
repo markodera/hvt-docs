@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from 'react';
 import { Github, Menu, Search, X } from 'lucide-react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
 
 import { EXTERNAL_LINKS } from '../docsData';
 import { HvtLogoMark } from './Logo';
@@ -38,6 +38,7 @@ export default function TopNav() {
 
   return (
     <>
+      <ScrollRestoration />
       <nav
         className="docs-topnav"
         style={{
