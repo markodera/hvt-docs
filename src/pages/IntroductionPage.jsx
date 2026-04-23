@@ -1,4 +1,7 @@
-﻿import DocPage, { DocSection } from '../components/DocPage';
+import { Link } from 'react-router-dom'
+
+import Callout from '../components/Callout'
+import DocPage, { DocSection } from '../components/DocPage'
 
 function PlainCard({ title, children }) {
   return (
@@ -6,7 +9,7 @@ function PlainCard({ title, children }) {
       <div style={{ marginBottom: '10px', color: '#ffffff', fontSize: '15px', fontWeight: 600 }}>{title}</div>
       <div className="docs-content">{children}</div>
     </div>
-  );
+  )
 }
 
 export default function IntroductionPage() {
@@ -20,6 +23,15 @@ export default function IntroductionPage() {
         <p>
           HVT is open-source authentication infrastructure. Instead of building your own account system from scratch, you create an organisation, create a project for each app or environment, issue an API key for that project, and let HVT handle the auth flow for that app.
         </p>
+        <Callout type="info" title="Platform isolation">
+          <p>
+            HVT has two separate user types. Platform users are developers who manage HVT via the dashboard. Runtime users are end users of apps built on HVT. Runtime users cannot access the dashboard or any control plane endpoint. This is enforced at the backend.
+          </p>
+          <p style={{ marginBottom: 0 }}>
+            Read <Link to="/concepts#platform-isolation" className="docs-link">Platform users and runtime users</Link> before you wire up runtime signup or login.
+          </p>
+        </Callout>
+        <div style={{ height: '16px' }} />
         <p>
           In practice, that means HVT can register users, sign them in, refresh tokens, run social login, emit audit events, and send webhooks while keeping the organisation and project context attached to every runtime action.
         </p>
@@ -65,6 +77,5 @@ export default function IntroductionPage() {
         </div>
       </DocSection>
     </DocPage>
-  );
+  )
 }
-

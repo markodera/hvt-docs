@@ -78,6 +78,7 @@ const hvt = new HVTClient({
   },
   '/concepts': {
     anchors: [
+      { id: 'platform-isolation', label: 'Platform users and runtime users' },
       { id: 'organisations', label: 'Organisation' },
       { id: 'projects', label: 'Project' },
       { id: 'api-key-and-token', label: 'API key and token' },
@@ -104,8 +105,11 @@ const hvt = new HVTClient({
   },
   '/guides/auth': {
     anchors: [
+      { id: 'user-types', label: 'Platform users and runtime users' },
       { id: 'control-plane-auth', label: 'Dashboard sign-in' },
-      { id: 'runtime-auth', label: 'App user sign-up and sign-in' },
+      { id: 'runtime-register', label: 'Runtime registration and sign-in' },
+      { id: 'runtime-bootstrap', label: 'Bootstrap the current runtime session' },
+      { id: 'invite-users', label: 'Inviting users with roles' },
       { id: 'social-auth', label: 'Social sign-in' },
       { id: 'refresh-logout', label: 'Refresh and logout' },
     ],
@@ -115,15 +119,20 @@ const hvt = new HVTClient({
   method: 'POST',
   auth: 'apiKey',
   body: {
-  email: 'user@example.com',
-  password1: 'Strongpass123!',
-  password2: 'Strongpass123!'
+    email: 'teacher@example.com',
+    password1: 'Strongpass123!',
+    password2: 'Strongpass123!',
+    role_slug: 'teacher'
   }
 })
 
 await client.auth.runtimeLogin({
-  email: 'user@example.com',
+  email: 'teacher@example.com',
   password: 'Strongpass123!'
+})
+
+await client.request('/api/v1/auth/runtime/me/', {
+  method: 'GET'
 })`,
     },
   },
@@ -133,6 +142,7 @@ await client.auth.runtimeLogin({
       { id: 'define-permissions', label: 'Define permissions first' },
       { id: 'assign-roles', label: 'Choose assignment flow' },
       { id: 'runtime-flow', label: 'Register and sign in runtime users' },
+      { id: 'dynamic-role-assignment', label: 'Change roles after account creation' },
       { id: 'read-access', label: 'Read live app access' },
       { id: 'enforce-access', label: 'Enforce in the app' },
       { id: 'common-pitfalls', label: 'Common mistakes' },
@@ -228,7 +238,7 @@ if (!permissions.includes('orders.read.own')) {
     ],
     sample: {
       label: 'Auth surface',
-      code: 'login, me, refresh, register, runtimeLogin, runtimeGoogle, runtimeGithub, request(/api/v1/auth/runtime/register/)',
+      code: 'login, me, refresh, runtimeLogin, runtimeGoogle, runtimeGithub, request(/api/v1/auth/runtime/register/), request(/api/v1/auth/runtime/me/)',
     },
   },
   '/sdk/errors': {
@@ -278,7 +288,7 @@ export const SEO_META = {
   '/guides/auth': {
     title: 'Authentication Flows – HVT Guides',
     description:
-      'Set up dashboard sign-in, runtime user registration and login, social OAuth (Google, GitHub), token refresh, and logout with HVT.',
+      'Set up dashboard sign-in, runtime user registration and login, runtime session bootstrap, social OAuth (Google, GitHub), token refresh, and logout with HVT.',
     breadcrumbs: [
       { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
       { name: 'Guides', item: 'https://docs.hvts.app/guides/auth' },
@@ -357,7 +367,7 @@ export const SEO_META = {
   '/sdk/auth': {
     title: 'auth methods – SDK Reference',
     description:
-      'Full reference for HVT SDK auth methods: login, register, runtimeLogin, token refresh, social auth (Google, GitHub), and more.',
+      'Full reference for HVT SDK auth methods: login, runtimeLogin, runtime session bootstrap via request, token refresh, social auth (Google, GitHub), and more.',
     breadcrumbs: [
       { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
       { name: 'SDK Reference', item: 'https://docs.hvts.app/sdk/auth' },

@@ -1,7 +1,7 @@
 ﻿import yaml from 'js-yaml';
 
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'options', 'head']);
-const TAG_ORDER = ['Auth', 'API Keys', 'Users', 'Organizations', 'Projects', 'Webhooks', 'Audit Logs'];
+const TAG_ORDER = ['Auth', 'Runtime Invitations', 'API Keys', 'Users', 'Organizations', 'Projects', 'Webhooks', 'Audit Logs'];
 
 function getRefName(ref) {
   return typeof ref === 'string' ? ref.split('/').pop() ?? null : null;
@@ -12,6 +12,7 @@ function normalizeTag(tag) {
   const lowered = value.toLowerCase();
   const map = {
     auth: 'Auth',
+    'runtime invitations': 'Runtime Invitations',
     'api keys': 'API Keys',
     apikeys: 'API Keys',
     users: 'Users',

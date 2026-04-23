@@ -13,23 +13,44 @@ export const hvt = new HVTClient({
 
 // Create once, export it, and import it everywhere else`;
 
-const AUTH_METHODS = `// Team members signing in to HVT
-await hvt.auth.login({ email, password })
+const AUTH_METHODS = `async function runAuthFlows() {
+  const email = 'user@example.com'
+  const password = 'Strongpass123!'
+  const code = 'oauth-code'
+  const callback_url = 'https://app.example.com/auth/google/callback'
 
-// End users of your app
-await hvt.auth.register({
-  email: 'user@example.com',
-  password1: 'Strongpass123!',
-  password2: 'Strongpass123!'
-})
-await hvt.auth.runtimeLogin({ email, password })
+  // Team members signing in to HVT
+  await hvt.auth.login({ email, password })
 
-// Runtime social login
-await hvt.auth.runtimeGoogle({ code, callback_url })
-await hvt.auth.runtimeGithub({ code, callback_url })
+  // End users of your app
+  await hvt.request('/api/v1/auth/runtime/register/', {
+    method: 'POST',
+    auth: 'apiKey',
+    body: {
+      email: 'user@example.com',
+      password1: 'Strongpass123!',
+      password2: 'Strongpass123!'
+    }
+  })
 
-await hvt.auth.refresh()
-await hvt.auth.logout()`;
+  await hvt.auth.runtimeLogin({ email, password })
+
+  const runtimeUser = await hvt.request('/api/v1/auth/runtime/me/', {
+    method: 'GET'
+  })
+
+  console.log(runtimeUser.project_slug)
+  console.log(runtimeUser.app_permissions)
+
+  // Runtime social login
+  await hvt.auth.runtimeGoogle({ code, callback_url })
+  await hvt.auth.runtimeGithub({ code, callback_url })
+
+  await hvt.auth.refresh()
+  await hvt.auth.logout()
+}
+
+runAuthFlows().catch(console.error)`;
 
 const API_KEY_METHODS = `await hvt.organizations.listApiKeys({ project: projectId })
 await hvt.organizations.createApiKey({
@@ -96,6 +117,10 @@ export default function SDKGuidePage() {
           The auth surface includes both dashboard auth for your team and runtime auth for the users of your app. The naming keeps those two jobs separate so you do not accidentally mix them.
         </p>
         <CodeBlock code={AUTH_METHODS} language="javascript" />
+        <div style={{ height: 16 }} />
+        <p>
+          Runtime registration and runtime session bootstrap currently use <code className="font-code">hvt.request(...)</code>. Use <code className="font-code">GET /api/v1/auth/runtime/me/</code> to load the current runtime user and the effective access set for the project in the active runtime session.
+        </p>
         <div style={{ height: 16 }} />
         <Callout type="info" title="Browser session defaults">
           In browser flows, HVT uses a <strong>15-minute</strong> access token and a <strong>7-day</strong> refresh session. Refresh before access-token expiry, or let your shared browser client do it automatically, so users stay signed in during normal activity.

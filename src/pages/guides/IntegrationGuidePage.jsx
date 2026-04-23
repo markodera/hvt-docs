@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 import DocPage, { DocSection } from '../../components/DocPage';
 import CodeBlock from '../../components/CodeBlock';
 import Callout from '../../components/Callout';
@@ -159,6 +161,10 @@ export default function IntegrationGuidePage() {
           <code style={{ display: 'block', backgroundColor: '#18181b', padding: '8px', borderRadius: '4px', marginBottom: '8px', color: '#fff' }}>POST /token/refresh/</code>
           <CodeBlock code={REFRESH_JWT_TOKEN} language="json" />
         </div>
+
+        <p style={{ marginBottom: '24px' }}>
+          To bootstrap an existing runtime session, use <code>/api/v1/auth/runtime/me/</code> and the refresh-retry flow described in <Link to="/guides/auth#runtime-bootstrap" className="docs-link">Bootstrap the current runtime session</Link>.
+        </p>
 
         <h4 style={{ fontSize: '16px', fontWeight: '600', marginTop: '24px', marginBottom: '8px', color: '#fff' }}>Password Management</h4>
         
