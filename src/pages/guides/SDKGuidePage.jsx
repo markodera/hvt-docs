@@ -43,7 +43,23 @@ const AUTH_METHODS = `async function runAuthFlows() {
   console.log(runtimeUser.app_permissions)
 
   // Runtime social login
-  await hvt.auth.runtimeGoogle({ code, callback_url })
+  const providers = await hvt.auth.listRuntimeSocialProviders()
+  const google = providers.providers.find((provider) => provider.provider === 'google')
+
+  if (!google) {
+    throw new Error('Google is not configured for this project')
+  }
+
+  const authorizationUrl = hvt.auth.buildSocialAuthorizationUrl(google, {
+    callbackUrl: callback_url,
+    state: 'csrf-token'
+  })
+
+  console.log(authorizationUrl)
+
+  const selectedRoleSlug = 'seller'
+
+  await hvt.auth.runtimeGoogle({ code, callback_url, role_slug: selectedRoleSlug })
   await hvt.auth.runtimeGithub({ code, callback_url })
 
   await hvt.auth.refresh()
@@ -121,6 +137,14 @@ export default function SDKGuidePage() {
         <p>
           Runtime registration and runtime session bootstrap currently use <code className="font-code">hvt.request(...)</code>. Use <code className="font-code">GET /api/v1/auth/runtime/me/</code> to load the current runtime user and the effective access set for the project in the active runtime session.
         </p>
+        <div style={{ height: 16 }} />
+        <Callout type="info" title="Passing a selected runtime role through social auth">
+          When your app offers self-assignable role selection before a Google or GitHub redirect, keep the chosen slug in client state or session storage and send it as <strong>role_slug</strong> when the callback page calls <strong>runtimeGoogle</strong> or <strong>runtimeGithub</strong>.
+        </Callout>
+        <div style={{ height: 16 }} />
+        <Callout type="info" title="Use the social URL helper">
+          Do not assume the raw <strong>authorization_url</strong> field is a complete browser link. Use <strong>hvt.auth.buildSocialAuthorizationUrl(provider, options)</strong> after <strong>listRuntimeSocialProviders()</strong> so the final OAuth URL includes the correct client ID, redirect URI, scope, and optional state.
+        </Callout>
         <div style={{ height: 16 }} />
         <Callout type="info" title="Browser session defaults">
           In browser flows, HVT uses a <strong>15-minute</strong> access token and a <strong>7-day</strong> refresh session. Refresh before access-token expiry, or let your shared browser client do it automatically, so users stay signed in during normal activity.

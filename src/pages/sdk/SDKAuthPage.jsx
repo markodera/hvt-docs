@@ -42,10 +42,27 @@ async function main() {
 
 main().catch(console.error)`;
 
-const SOCIAL = `await client.auth.listSocialProviders()
-await client.auth.socialGoogle({ code })
-await client.auth.listRuntimeSocialProviders()
-await client.auth.runtimeGithub({ code, callback_url })`;
+const SOCIAL = `const providers = await client.auth.listRuntimeSocialProviders()
+const github = providers.providers.find((provider) => provider.provider === 'github')
+
+if (!github) {
+  throw new Error('GitHub is not configured for this project')
+}
+
+const authorizationUrl = client.auth.buildSocialAuthorizationUrl(github, {
+  origin: 'http://localhost:3000',
+  state: 'csrf-token'
+})
+
+console.log(authorizationUrl)
+
+const selectedRoleSlug = 'seller'
+
+await client.auth.runtimeGithub({
+  code,
+  callback_url,
+  role_slug: selectedRoleSlug
+})`;
 
 export default function SDKAuthPage() {
   return (
@@ -80,6 +97,14 @@ export default function SDKAuthPage() {
 
       <DocSection id="social-methods" title="Social methods">
         <CodeBlock code={SOCIAL} language="javascript" />
+        <div style={{ height: 16 }} />
+        <Callout type="warning" title="Use the helper, not the raw field">
+          <strong>listRuntimeSocialProviders()</strong> returns provider metadata. Use <strong>client.auth.buildSocialAuthorizationUrl(provider, options)</strong> to generate the user-facing authorization URL. The raw <strong>authorization_url</strong> field is the provider endpoint, not a guaranteed fully assembled browser link.
+        </Callout>
+        <div style={{ height: 16 }} />
+        <Callout type="info" title="Role-aware social signup">
+          If your signup UI lets the user choose a self-assignable role before redirecting to Google or GitHub, persist that slug through the redirect and send it as <strong>role_slug</strong> on the callback request. HVT applies the selected role on first-time runtime social signup and falls back to default signup roles when <strong>role_slug</strong> is omitted.
+        </Callout>
       </DocSection>
     </DocPage>
   );

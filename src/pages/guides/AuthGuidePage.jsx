@@ -173,11 +173,25 @@ async function main() {
   })
 
   const providers = await client.auth.listRuntimeSocialProviders()
-  console.log(providers)
+  const google = providers.providers.find((provider) => provider.provider === 'google')
+
+  if (!google) {
+    throw new Error('Google is not configured for this project')
+  }
+
+  const authorizationUrl = client.auth.buildSocialAuthorizationUrl(google, {
+    origin: 'https://app.example.com',
+    state: 'csrf-token'
+  })
+
+  console.log(authorizationUrl)
+
+  const selectedRoleSlug = sessionStorage.getItem('selectedRoleSlug')
 
   const session = await client.auth.runtimeGoogle({
     code: 'google-oauth-code',
-    callback_url: 'https://app.example.com/auth/google/callback'
+    callback_url: 'https://app.example.com/auth/google/callback',
+    role_slug: selectedRoleSlug || undefined
   })
 
   console.log(session.access)
@@ -335,7 +349,7 @@ export default function AuthGuidePage() {
               name: <code className="font-code">role_slug</code>,
               type: 'string',
               required: 'No',
-              description: 'The slug of a project role marked as self-assignable. If provided, HVT assigns that role in addition to any default signup roles. If the role does not exist in the project or is not self-assignable, registration is rejected.',
+              description: 'The slug of a project role marked as self-assignable. If provided, HVT assigns that selected role instead of the project default signup roles. If the role does not exist in the project or is not self-assignable, registration is rejected.',
             },
           ]}
           requestExample={{ code: SELF_ASSIGNABLE_SIGNUP, language: 'javascript' }}
@@ -702,7 +716,14 @@ export default function AuthGuidePage() {
         <p>
           Runtime social auth is project-aware. The identity provider changes, but the project boundary and resolved runtime roles do not.
         </p>
+        <p>
+          If your signup screen lets the user choose a self-assignable role before redirecting to Google or GitHub, persist that selection in frontend state and send it back as <code className="font-code">role_slug</code> on the callback request. On first-time runtime social signup, the selected role replaces the project&rsquo;s default signup roles. When <code className="font-code">role_slug</code> is omitted, HVT uses the default signup roles instead.
+        </p>
         <CodeBlock code={SOCIAL} language="javascript" />
+        <div style={{ height: 16 }} />
+        <Callout type="warning" title="Provider metadata vs final browser URL">
+          The provider record returned by <strong>listRuntimeSocialProviders()</strong> contains metadata such as <strong>client_id</strong>, <strong>scope</strong>, and the provider authorization endpoint. Use <strong>client.auth.buildSocialAuthorizationUrl(provider, options)</strong> to construct the final browser-ready OAuth URL instead of linking the raw <strong>authorization_url</strong> field directly.
+        </Callout>
         <div style={{ height: 16 }} />
         <p>
           Social login resolves the same project access model described in <Link to="/guides/runtime-roles#role-model" className="docs-link">Runtime roles and permissions</Link>.

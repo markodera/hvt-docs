@@ -175,13 +175,13 @@ export default function RuntimeRolesGuidePage() {
         <CodeBlock code={ROLES} language="json" />
         <div style={{ height: 16 }} />
         <p>
-          <strong>is_default_signup</strong> controls which roles are added automatically during public signup. <strong>is_self_assignable</strong> controls which roles can be requested through <Link to="/guides/auth#runtime-register" className="docs-link">runtime registration</Link>.
+          <strong>is_default_signup</strong> controls which roles are added automatically during public signup. <strong>is_self_assignable</strong> controls which roles can be requested through <Link to="/guides/auth#runtime-register" className="docs-link">runtime registration</Link> or first-time <Link to="/guides/auth#social-auth" className="docs-link">runtime social signup</Link>.
         </p>
       </DocSection>
 
       <DocSection id="assign-roles" title="3. Choose how users receive roles">
         <p>
-          Public signup is the right path for safe default access. If the app should let a user choose from a narrow set of allowed roles, use the optional <code className="font-code">role_slug</code> field described in <Link to="/guides/auth#runtime-register" className="docs-link">Runtime registration and sign-in</Link>.
+          Public signup is the right path for safe default access. If the app should let a user choose from a narrow set of allowed roles, use the optional <code className="font-code">role_slug</code> field described in <Link to="/guides/auth#runtime-register" className="docs-link">Runtime registration and sign-in</Link>. The same field is accepted on the runtime social callback endpoints, so a frontend can carry the selected slug through the OAuth redirect and send it back on first-time social signup.
         </p>
         <p>
           If the role requires approval, use <Link to="/guides/auth#invite-users" className="docs-link">Inviting users with roles</Link>. If the role changes because of an event in your system after the account exists, use the slug-based replacement endpoint in <Link to="/guides/runtime-roles#dynamic-role-assignment" className="docs-link">Change roles after account creation</Link>.
