@@ -10,14 +10,8 @@ paths:
   /api/v1/auth/login/:
     post:
       operationId: auth_login_create
-      description: |-
-        Check the credentials and return the REST Token
-        if the credentials are valid and authenticated.
-        Calls Django Auth login method to register User ID
-        in Django session framework
-
-        Accept the following POST parameters: username, password
-        Return the REST Framework Token Object's key.
+      description: Reject runtime users on control-plane auth endpoints without leaking
+        identity details.
       tags:
       - auth
       requestBody:
@@ -408,34 +402,21 @@ paths:
     get:
       operationId: auth_runtime_me_retrieve
       description: Returns the authenticated runtime user's profile and effective
-        app access for the project encoded in the current runtime session.
+        app access for the project encoded in the current JWT session.
       summary: Get current runtime user profile
       tags:
       - Auth
       security:
       - jwtCookieAuth: []
       - BearerAuth: []
+      - APIKeyAuth: []
       responses:
         '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RuntimeCurrentUser'
-          description: Runtime user profile plus effective roles and permissions
-            for the current runtime session project.
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthenticationErrorEnvelope'
-          description: Missing, invalid, or expired runtime session.
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PermissionDeniedErrorEnvelope'
-          description: Control-plane JWT used, runtime session missing project context,
-            or the token project does not match the current runtime user.
+          description: ''
   /api/v1/auth/runtime/password/reset/:
     post:
       operationId: auth_runtime_password_reset_create
@@ -543,9 +524,10 @@ paths:
   /api/v1/auth/runtime/register/:
     post:
       operationId: auth_runtime_register_create
-      description: Register a runtime user within the project resolved from the provided
-        X-API-Key. Use role_slug to request one additional self-assignable project
-        role during signup.
+      description: |-
+        Register an end user within the organization and project identified by the provided X-API-Key.
+
+        Verification emails are currently sent from HVT's email infrastructure. Per-project sender branding — custom domain, sender name, and templates — is planned for Builder tier and above.
       summary: Runtime register
       tags:
       - Auth
@@ -562,40 +544,17 @@ paths:
               $ref: '#/components/schemas/RuntimeRegisterRequest'
         required: true
       security:
+      - jwtCookieAuth: []
+      - BearerAuth: []
       - APIKeyAuth: []
+      - {}
       responses:
         '201':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RuntimeRegister'
-          description: Registered runtime user record. This endpoint does not return
-            JWTs.
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationErrorEnvelope'
-          description: Validation failed, the email already exists in this project,
-            or role_slug is invalid.
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthenticationErrorEnvelope'
-          description: Missing or invalid X-API-Key header.
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PermissionDeniedErrorEnvelope'
-          description: API key does not include the auth:runtime scope.
-        '429':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RateLimitErrorEnvelope'
-          description: Request throttled.
+          description: ''
   /api/v1/auth/runtime/register/resend-email/:
     post:
       operationId: auth_runtime_register_resend_email_create
@@ -657,103 +616,6 @@ paths:
       responses:
         '200':
           description: No response body
-  /api/v1/runtime/invitations/:
-    post:
-      operationId: runtime_invitations_create
-      description: Invite a runtime user into the project resolved from the provided
-        X-API-Key. The response does not include the invitation token or accept URL.
-      summary: Create runtime invitation
-      tags:
-      - Runtime Invitations
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RuntimeInvitationCreateRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RuntimeInvitationCreateRequest'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/RuntimeInvitationCreateRequest'
-        required: true
-      security:
-      - APIKeyAuth: []
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RuntimeInvitation'
-          description: Invitation record. When the email belongs to a platform user,
-            HVT returns an empty 201 response instead.
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationErrorEnvelope'
-          description: The email already exists in this project, a role slug is unknown,
-            or a control plane role slug was provided.
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthenticationErrorEnvelope'
-          description: Missing or invalid X-API-Key header.
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PermissionDeniedErrorEnvelope'
-          description: API key does not include the auth:runtime scope.
-        '429':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RateLimitErrorEnvelope'
-          description: Request throttled.
-  /api/v1/runtime/invitations/accept/:
-    post:
-      operationId: runtime_invitations_accept_create
-      description: Accept a runtime invitation token, create the runtime user, and
-        immediately return a JWT pair.
-      summary: Accept runtime invitation
-      tags:
-      - Runtime Invitations
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RuntimeInvitationAcceptRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RuntimeInvitationAcceptRequest'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/RuntimeInvitationAcceptRequest'
-        required: true
-      security:
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RuntimeInvitationAcceptResponse'
-          description: JWT access and refresh tokens for the new runtime session.
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequestErrorEnvelope'
-          description: Invitation already accepted or revoked, invitation expired,
-            or password validation failed.
-        '404':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundErrorEnvelope'
-          description: Invitation token not found.
   /api/v1/auth/runtime/social/github/:
     post:
       operationId: auth_runtime_social_github_create
@@ -836,27 +698,8 @@ paths:
   /api/v1/auth/social/github/:
     post:
       operationId: auth_social_github_create
-      description: |-
-        class used for social authentications
-        example usage for facebook with access_token
-        -------------
-        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-
-        class FacebookLogin(SocialLoginView):
-            adapter_class = FacebookOAuth2Adapter
-        -------------
-
-        example usage for facebook with code
-
-        -------------
-        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-        from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-
-        class FacebookLogin(SocialLoginView):
-            adapter_class = FacebookOAuth2Adapter
-            client_class = OAuth2Client
-            callback_url = 'localhost:8000'
-        -------------
+      description: Reject runtime users on control-plane auth endpoints without leaking
+        identity details.
       tags:
       - auth
       requestBody:
@@ -885,27 +728,8 @@ paths:
   /api/v1/auth/social/google/:
     post:
       operationId: auth_social_google_create
-      description: |-
-        class used for social authentications
-        example usage for facebook with access_token
-        -------------
-        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-
-        class FacebookLogin(SocialLoginView):
-            adapter_class = FacebookOAuth2Adapter
-        -------------
-
-        example usage for facebook with code
-
-        -------------
-        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-        from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-
-        class FacebookLogin(SocialLoginView):
-            adapter_class = FacebookOAuth2Adapter
-            client_class = OAuth2Client
-            callback_url = 'localhost:8000'
-        -------------
+      description: Reject runtime users on control-plane auth endpoints without leaking
+        identity details.
       tags:
       - auth
       requestBody:
@@ -1659,7 +1483,7 @@ paths:
           description: ''
     delete:
       operationId: organizations_current_keys_destroy
-      description: Permanently delete an API key. This action cannot be undone.
+      description: Permanently delete a revoked API key. This action cannot be undone.
       summary: Delete an API key
       parameters:
       - in: path
@@ -2018,8 +1842,7 @@ paths:
           description: ''
     delete:
       operationId: organizations_current_projects_destroy
-      description: Delete a non-default project in the current organization. Owner
-        only.
+      description: Delete a project in the current organization. Owner only.
       summary: Delete a project
       parameters:
       - in: path
@@ -2778,8 +2601,8 @@ paths:
           description: ''
     put:
       operationId: organizations_current_projects_users_roles_update
-      description: Replace a user's assigned app roles for a project using role slugs.
-        Owner/admin only.
+      description: Replace a user's assigned app roles for a project. Owner/admin
+        only.
       summary: Replace user app roles for a project
       parameters:
       - in: path
@@ -2821,8 +2644,8 @@ paths:
           description: ''
     patch:
       operationId: organizations_current_projects_users_roles_partial_update
-      description: Replace a user's assigned app roles for a project using role slugs.
-        Owner/admin only.
+      description: Replace a user's assigned app roles for a project. Owner/admin
+        only.
       summary: Replace user app roles for a project
       parameters:
       - in: path
@@ -3191,6 +3014,88 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrganizationInvitationPublic'
+          description: ''
+  /api/v1/runtime/invitations/:
+    get:
+      operationId: runtime_invitations_list
+      description: List runtime invitations for the project resolved from the provided
+        API key. Supports optional filtering by status and email.
+      summary: List runtime invitations
+      tags:
+      - Runtime Invitations
+      security:
+      - APIKeyAuth: []
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RuntimeInvitation'
+          description: ''
+    post:
+      operationId: runtime_invitations_create
+      description: Invite a runtime user into the project resolved from the provided
+        API key.
+      summary: Create runtime invitation
+      tags:
+      - Runtime Invitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuntimeInvitationCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RuntimeInvitationCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RuntimeInvitationCreateRequest'
+        required: true
+      security:
+      - APIKeyAuth: []
+      - jwtCookieAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeInvitation'
+          description: ''
+  /api/v1/runtime/invitations/accept/:
+    post:
+      operationId: runtime_invitations_accept_create
+      description: Accept a runtime invitation token and immediately return a JWT
+        pair.
+      summary: Accept runtime invitation
+      tags:
+      - Runtime Invitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuntimeInvitationAcceptRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RuntimeInvitationAcceptRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RuntimeInvitationAcceptRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeInvitationAcceptResponse'
           description: ''
   /api/v1/users/:
     get:
@@ -3566,8 +3471,8 @@ components:
           type: string
           format: uuid
           writeOnly: true
-          description: Optional project ID. Defaults to the organization's default
-            project.
+          description: Project ID. Defaults to the organization's primary project
+            when one exists.
       required:
       - name
     APIKeyList:
@@ -3901,6 +3806,7 @@ components:
       - social.disconnected
       - api_key.created
       - api_key.revoked
+      - api_key.deleted
       - api_key.used
       - user.created
       - user.updated
@@ -3914,6 +3820,8 @@ components:
       - org.invitation.accepted
       - org.invitation.revoked
       - org.invitation.resent
+      - runtime_user.invited
+      - runtime_user.invite_accepted
       - project.created
       - project.updated
       - project.deleted
@@ -3937,6 +3845,7 @@ components:
         * `social.disconnected` - Social Account disconnected
         * `api_key.created` - API Key Created
         * `api_key.revoked` - API Key Revoked
+        * `api_key.deleted` - API Key Deleted
         * `api_key.used` - API Key Used
         * `user.created` - User Created
         * `user.updated` - User Updated
@@ -3950,6 +3859,8 @@ components:
         * `org.invitation.accepted` - Organization Invitation Accepted
         * `org.invitation.revoked` - Organization Invitation Revoked
         * `org.invitation.resent` - Organization Invitation Resent
+        * `runtime_user.invited` - Runtime User Invited
+        * `runtime_user.invite_accepted` - Runtime User Invite Accepted
         * `project.created` - Project Created
         * `project.updated` - Project Updated
         * `project.deleted` - Project Deleted
@@ -4801,7 +4712,7 @@ components:
           description: Assign this role automatically during public runtime signup.
         is_self_assignable:
           type: boolean
-          description: Allow this role to be requested through runtime registration.
+          description: Allow runtime users to request this role during registration.
         permission_ids:
           type: array
           items:
@@ -4814,13 +4725,9 @@ components:
       properties:
         role_slugs:
           type: array
-          description: Full replacement list of project role slugs.
           items:
             type: string
-            pattern: ^[a-z0-9]+(?:[._:-][a-z0-9]+)*$
-          example:
-          - seller
-          - verified_seller
+            minLength: 1
     PatchedSocialProviderConfigRequest:
       type: object
       description: Serializer for per-project social provider configuration.
@@ -4880,8 +4787,8 @@ components:
           type: string
           format: uuid
           writeOnly: true
-          description: Optional project ID. Defaults to the organization's default
-            project.
+          description: Project ID. Defaults to the organization's primary project
+            when one exists.
         url:
           type: string
           format: uri
@@ -5057,7 +4964,7 @@ components:
           description: Assign this role automatically during public runtime signup.
         is_self_assignable:
           type: boolean
-          description: Allow this role to be requested through runtime registration.
+          description: Allow runtime users to request this role during registration.
         permissions:
           type: array
           items:
@@ -5074,7 +4981,6 @@ components:
       required:
       - created_at
       - id
-      - is_self_assignable
       - name
       - permissions
       - project
@@ -5101,7 +5007,7 @@ components:
           description: Assign this role automatically during public runtime signup.
         is_self_assignable:
           type: boolean
-          description: Allow this role to be requested through runtime registration.
+          description: Allow runtime users to request this role during registration.
         permission_ids:
           type: array
           items:
@@ -5109,7 +5015,6 @@ components:
             format: uuid
           writeOnly: true
       required:
-      - is_self_assignable
       - name
       - slug
     ProjectRoleSummary:
@@ -5124,11 +5029,9 @@ components:
           type: string
           readOnly: true
           description: Stable role identifier such as buyer or teacher.
-          example: seller
         name:
           type: string
           readOnly: true
-          example: Seller
       required:
       - id
       - name
@@ -5154,7 +5057,6 @@ components:
           type: array
           items:
             type: string
-            example: products.create
           readOnly: true
       required:
       - permissions
@@ -5167,13 +5069,9 @@ components:
       properties:
         role_slugs:
           type: array
-          description: Full replacement list of project role slugs.
           items:
             type: string
-            pattern: ^[a-z0-9]+(?:[._:-][a-z0-9]+)*$
-          example:
-          - seller
-          - verified_seller
+            minLength: 1
       required:
       - role_slugs
     ProviderEnum:
@@ -5192,148 +5090,204 @@ components:
           readOnly: true
       required:
       - detail
-    AuthenticationErrorEnvelope:
+    RuntimeCurrentUser:
+      type: object
+      description: Serializer for runtime session bootstrap tied to the token's project
+        context.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+        full_name:
+          type: string
+          readOnly: true
+        organization:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        organization_slug:
+          type: string
+          readOnly: true
+          nullable: true
+        project:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        project_slug:
+          type: string
+          nullable: true
+          readOnly: true
+        app_roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProjectRoleSummary'
+          readOnly: true
+        app_permissions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          readOnly: true
+        role_display:
+          type: string
+          readOnly: true
+        is_project_scoped:
+          type: boolean
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        is_test:
+          type: boolean
+          readOnly: true
+          description: Test user are only access via test API keys
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - app_permissions
+      - app_roles
+      - created_at
+      - email
+      - first_name
+      - full_name
+      - id
+      - is_active
+      - is_project_scoped
+      - is_test
+      - last_name
+      - organization
+      - organization_slug
+      - project
+      - project_slug
+      - role
+      - role_display
+    RuntimeInvitation:
       type: object
       properties:
-        error:
+        id:
           type: string
-          example: Unauthorized
-        code:
+          format: uuid
+          readOnly: true
+        project:
           type: string
-          example: authentication_failed
-        detail:
+          format: uuid
+          readOnly: true
+        project_slug:
           type: string
-          example: A valid X-API-Key header is required.
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        role_slugs:
+          readOnly: true
         status:
-          type: integer
-          example: 401
+          allOf:
+          - $ref: '#/components/schemas/RuntimeInvitationStatusEnum'
+          readOnly: true
+        expires_at:
+          type: string
+          format: date-time
+          readOnly: true
+        accepted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
       required:
-      - code
-      - detail
-      - error
+      - accepted_at
+      - created_at
+      - email
+      - expires_at
+      - id
+      - project
+      - project_slug
+      - role_slugs
       - status
-    BadRequestErrorEnvelope:
+    RuntimeInvitationAcceptRequest:
       type: object
       properties:
-        error:
+        token:
           type: string
-          example: Bad Request
-        code:
+          minLength: 1
+          maxLength: 128
+        password1:
           type: string
-          example: validation_error
-        detail:
+          writeOnly: true
+          minLength: 1
+        password2:
           type: string
-          example: This invitation has expired
-        status:
-          type: integer
-          example: 400
+          writeOnly: true
+          minLength: 1
       required:
-      - code
-      - detail
-      - error
-      - status
-    NotFoundErrorEnvelope:
+      - password1
+      - password2
+      - token
+    RuntimeInvitationAcceptResponse:
       type: object
       properties:
-        error:
+        access:
           type: string
-          example: Not Found
-        code:
+        refresh:
           type: string
-          example: not_found
-        detail:
-          type: string
-          example: Not found.
-        status:
-          type: integer
-          example: 404
       required:
-      - code
-      - detail
-      - error
-      - status
-    PermissionDeniedErrorEnvelope:
+      - access
+      - refresh
+    RuntimeInvitationCreateRequest:
       type: object
       properties:
-        error:
+        email:
           type: string
-          example: Forbidden
-        code:
+          format: email
+          minLength: 1
+        role_slugs:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        first_name:
           type: string
-          example: permission_denied
-        detail:
+          maxLength: 150
+        last_name:
           type: string
-          example: This API key does not have the required auth:runtime scope.
-        status:
-          type: integer
-          example: 403
+          maxLength: 150
       required:
-      - code
-      - detail
-      - error
-      - status
-    RateLimitErrorEnvelope:
-      type: object
-      properties:
-        error:
-          type: string
-          example: Too Many Requests
-        code:
-          type: string
-          example: throttled
-        detail:
-          type: object
-          properties:
-            message:
-              type: string
-              example: Too many requests. Try again in 1 hour.
-            retry_after_seconds:
-              type: integer
-              example: 3600
-            retry_after_human:
-              type: string
-              example: 1 hour
-          required:
-          - message
-          - retry_after_human
-          - retry_after_seconds
-        status:
-          type: integer
-          example: 429
-      required:
-      - code
-      - detail
-      - error
-      - status
-    ValidationErrorEnvelope:
-      type: object
-      properties:
-        error:
-          type: string
-          example: Bad Request
-        code:
-          type: string
-          example: validation_error
-        detail:
-          type: object
-          properties:
-            role_slug:
-              type: array
-              items:
-                type: string
-              example:
-              - This role cannot be self-assigned
-          example:
-            role_slug:
-            - This role cannot be self-assigned
-        status:
-          type: integer
-          example: 400
-      required:
-      - code
-      - detail
-      - error
-      - status
+      - email
+      - role_slugs
+    RuntimeInvitationStatusEnum:
+      enum:
+      - pending
+      - accepted
+      - expired
+      - revoked
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `accepted` - Accepted
+        * `expired` - Expired
+        * `revoked` - Revoked
     RuntimeLogin:
       type: object
       description: Login serializer for app-runtime auth scoped by API key org.
@@ -5357,110 +5311,6 @@ components:
           minLength: 1
       required:
       - password
-    RuntimeCurrentUser:
-      type: object
-      description: Serializer for runtime session bootstrap tied to the token's project
-        context.
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-          example: 11111111-1111-4111-8111-111111111111
-        email:
-          type: string
-          format: email
-          readOnly: true
-          example: buyer@example.com
-        first_name:
-          type: string
-          readOnly: true
-          example: Ada
-        last_name:
-          type: string
-          readOnly: true
-          example: Buyer
-        full_name:
-          type: string
-          readOnly: true
-          example: Ada Buyer
-        organization:
-          type: string
-          format: uuid
-          readOnly: true
-          nullable: true
-          example: 22222222-2222-4222-8222-222222222222
-        organization_slug:
-          type: string
-          readOnly: true
-          nullable: true
-          example: runtime-org
-        project:
-          type: string
-          format: uuid
-          nullable: true
-          readOnly: true
-          example: 33333333-3333-4333-8333-333333333333
-        project_slug:
-          type: string
-          nullable: true
-          readOnly: true
-          example: storefront-prod
-        app_roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserProjectRoleSummary'
-          readOnly: true
-        app_permissions:
-          type: array
-          items:
-            type: string
-            example: orders.read.own
-          readOnly: true
-        role:
-          allOf:
-          - $ref: '#/components/schemas/UserRoleEnum'
-          readOnly: true
-        role_display:
-          type: string
-          readOnly: true
-          example: Member
-        is_project_scoped:
-          type: boolean
-          readOnly: true
-          example: true
-        is_active:
-          type: boolean
-          readOnly: true
-          example: true
-        is_test:
-          type: boolean
-          readOnly: true
-          description: Test user are only access via test API keys
-          example: false
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-          example: '2026-04-22T12:00:00Z'
-      required:
-      - app_permissions
-      - app_roles
-      - created_at
-      - email
-      - first_name
-      - full_name
-      - id
-      - is_active
-      - is_project_scoped
-      - is_test
-      - last_name
-      - organization
-      - organization_slug
-      - project
-      - project_slug
-      - role
-      - role_display
     RuntimePasswordReset:
       type: object
       description: Password reset serializer scoped to the runtime API key organization/project.
@@ -5487,15 +5337,14 @@ components:
         email:
           type: string
           format: email
-          example: teacher@example.com
         first_name:
           type: string
           maxLength: 150
-          example: Ada
         last_name:
           type: string
           maxLength: 150
-          example: Lovelace
+        role_slug:
+          type: string
       required:
       - email
     RuntimeRegisterRequest:
@@ -5506,157 +5355,27 @@ components:
           type: string
           format: email
           minLength: 1
-          example: teacher@example.com
         password1:
           type: string
           writeOnly: true
           minLength: 1
-          example: Strongpass123!
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          example: Strongpass123!
         first_name:
           type: string
           maxLength: 150
-          example: Ada
         last_name:
           type: string
           maxLength: 150
-          example: Lovelace
         role_slug:
           type: string
-          description: Project role slug that must exist in the current project and
-            be marked is_self_assignable.
-          pattern: ^[a-z0-9]+(?:[._:-][a-z0-9]+)*$
-          maxLength: 100
-          example: teacher
+          minLength: 1
       required:
       - email
       - password1
       - password2
-    RuntimeInvitation:
-      type: object
-      description: Runtime invitation record returned by the invite creation endpoint.
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        project:
-          type: string
-          format: uuid
-          readOnly: true
-        project_slug:
-          type: string
-          readOnly: true
-        email:
-          type: string
-          format: email
-          readOnly: true
-        role_slugs:
-          type: array
-          items:
-            type: string
-          readOnly: true
-          example:
-          - teacher
-        status:
-          type: string
-          readOnly: true
-          example: pending
-        expires_at:
-          type: string
-          format: date-time
-          readOnly: true
-        accepted_at:
-          type: string
-          format: date-time
-          readOnly: true
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-      required:
-      - accepted_at
-      - created_at
-      - email
-      - expires_at
-      - id
-      - project
-      - project_slug
-      - role_slugs
-      - status
-    RuntimeInvitationAcceptRequest:
-      type: object
-      description: Accept a runtime invitation token and set the first password for
-        the new runtime user.
-      properties:
-        token:
-          type: string
-          minLength: 1
-          maxLength: 128
-          example: paste-invite-token-here
-        password1:
-          type: string
-          writeOnly: true
-          minLength: 1
-          example: Strongpass123!
-        password2:
-          type: string
-          writeOnly: true
-          minLength: 1
-          example: Strongpass123!
-      required:
-      - password1
-      - password2
-      - token
-    RuntimeInvitationAcceptResponse:
-      type: object
-      description: JWT pair returned immediately after a runtime invitation is accepted.
-      properties:
-        access:
-          type: string
-          readOnly: true
-          example: eyJhbGciOi...
-        refresh:
-          type: string
-          readOnly: true
-          example: eyJhbGciOi...
-      required:
-      - access
-      - refresh
-    RuntimeInvitationCreateRequest:
-      type: object
-      description: Create a runtime invitation in the current project.
-      properties:
-        email:
-          type: string
-          format: email
-          minLength: 1
-          maxLength: 254
-          example: teacher@example.com
-        role_slugs:
-          type: array
-          items:
-            type: string
-            pattern: ^[a-z0-9]+(?:[._:-][a-z0-9]+)*$
-          minItems: 1
-          example:
-          - teacher
-        first_name:
-          type: string
-          maxLength: 150
-          example: Ada
-        last_name:
-          type: string
-          maxLength: 150
-          example: Lovelace
-      required:
-      - email
-      - role_slugs
     RuntimeResendEmailVerification:
       type: object
       description: Serializer for runtime resend-verification requests.
@@ -5689,6 +5408,8 @@ components:
         callback_url:
           type: string
           format: uri
+        role_slug:
+          type: string
     RuntimeSocialLoginRequest:
       type: object
       description: Social login serializer for runtime app users scoped by API key/project.
@@ -5702,6 +5423,9 @@ components:
         callback_url:
           type: string
           format: uri
+          minLength: 1
+        role_slug:
+          type: string
           minLength: 1
     SocialProviderConfig:
       type: object
@@ -5777,18 +5501,6 @@ components:
       - client_id
       - provider
       - redirect_uris
-    StatusEnum:
-      enum:
-      - pending
-      - success
-      - failed
-      - retrying
-      type: string
-      description: |-
-        * `pending` - Pending
-        * `success` - Success
-        * `failed` - Failed
-        * `retrying` - Retrying
     User:
       type: object
       description: Serializer for User model
@@ -6069,7 +5781,7 @@ components:
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/StatusEnum'
+          - $ref: '#/components/schemas/WebhookDeliveryStatusEnum'
           readOnly: true
         response_status_code:
           type: integer
@@ -6114,6 +5826,18 @@ components:
       - response_body
       - response_status_code
       - status
+    WebhookDeliveryStatusEnum:
+      enum:
+      - pending
+      - success
+      - failed
+      - retrying
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `success` - Success
+        * `failed` - Failed
+        * `retrying` - Retrying
     WebhookRequest:
       type: object
       properties:
@@ -6121,8 +5845,8 @@ components:
           type: string
           format: uuid
           writeOnly: true
-          description: Optional project ID. Defaults to the organization's default
-            project.
+          description: Project ID. Defaults to the organization's primary project
+            when one exists.
         url:
           type: string
           format: uri
