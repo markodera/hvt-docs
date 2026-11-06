@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import CodeBlock from '../../components/CodeBlock';
 import { DocHeading, DocParagraph, InlineCode } from '../../components/DocElements';
 import Callout from '../../components/Callout';
