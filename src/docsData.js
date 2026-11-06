@@ -1,4 +1,4 @@
-﻿export const EXTERNAL_LINKS = {
+export const EXTERNAL_LINKS = {
   app: 'https://hvts.app',
   github: 'https://github.com/markodera/hvt-docs',
   status: 'https://api.hvts.app/healthz/',
@@ -23,8 +23,17 @@ export const SIDEBAR_SECTIONS = [
       { title: 'Authentication flows', path: '/guides/auth' },
       { title: 'Runtime roles and permissions', path: '/guides/runtime-roles' },
       { title: 'SDK usage', path: '/guides/sdk' },
+      { title: 'Passkeys & WebAuthn', path: '/guides/passkeys' },
+      { title: 'Passwordless Magic Links', path: '/guides/magic-links' },
+      { title: 'Two-Factor Auth (TOTP)', path: '/guides/mfa' },
       { title: 'Webhooks', path: '/guides/webhooks' },
-      { title: 'Audit logs', path: '/guides/audit-logs' },
+    ],
+  },
+  {
+    label: 'FRAMEWORK RECIPES',
+    items: [
+      { title: 'Next.js 15 App Router', path: '/guides/nextjs' },
+      { title: 'FastAPI Backend', path: '/guides/fastapi' },
     ],
   },
   {
@@ -36,6 +45,7 @@ export const SIDEBAR_SECTIONS = [
     items: [
       { title: 'HVTClient', path: '/sdk/hvtclient' },
       { title: 'auth methods', path: '/sdk/auth' },
+      { title: 'React components & hooks', path: '/sdk/react' },
       { title: 'Error handling', path: '/sdk/errors' },
     ],
   },
@@ -203,6 +213,30 @@ if (!permissions.includes('orders.read.own')) {
 })`,
     },
   },
+  '/guides/nextjs': {
+    anchors: [
+      { id: 'install', label: '1. Install the SDK' },
+      { id: 'env-vars', label: '2. Environment Variables' },
+      { id: 'middleware', label: '3. Edge Middleware Route Protection' },
+      { id: 'server-component', label: '4. Server Component Session Verification' },
+    ],
+    sample: {
+      label: 'Next.js Middleware',
+      code: 'export function middleware(req) {\n  const token = req.cookies.get("hvt_access")?.value;\n  if (!token) return NextResponse.redirect(new URL("/login", req.url));\n}',
+    },
+  },
+  '/guides/fastapi': {
+    anchors: [
+      { id: 'install', label: '1. Dependencies' },
+      { id: 'auth-dependency', label: '2. HVT Authentication Dependency' },
+      { id: 'permission-checker', label: '3. Granular Permission Guard' },
+      { id: 'endpoint-usage', label: '4. Protected Route Example' },
+    ],
+    sample: {
+      label: 'FastAPI Guard',
+      code: '@app.post("/orders")\nasync def create_order(user = Depends(require_permission("orders.create"))):\n    return {"status": "ok"}',
+    },
+  },
   '/guides/sdk': {
     anchors: [
       { id: 'installation', label: 'Installation' },
@@ -241,6 +275,19 @@ if (!permissions.includes('orders.read.own')) {
       code: 'login, me, refresh, runtimeLogin, runtimeGoogle, runtimeGithub, request(/api/v1/auth/runtime/register/), request(/api/v1/auth/runtime/me/)',
     },
   },
+  '/sdk/react': {
+    anchors: [
+      { id: 'installation', label: 'Installation' },
+      { id: 'provider-setup', label: '1. Provider Setup' },
+      { id: 'use-hvt-auth', label: '2. The useHVTAuth Hook' },
+      { id: 'permission-gate', label: '3. Declarative Permission Gating' },
+      { id: 'role-gate', label: '4. Declarative Role Gating' },
+    ],
+    sample: {
+      label: 'React Provider',
+      code: '<HVTProvider client={hvt}>\n  <PermissionGate permission="orders.create">\n    <CreateOrderButton />\n  </PermissionGate>\n</HVTProvider>',
+    },
+  },
   '/sdk/errors': {
     anchors: [
       { id: 'hvt-api-error', label: 'HVTApiError' },
@@ -249,6 +296,41 @@ if (!permissions.includes('orders.read.own')) {
     sample: {
       label: 'Fields',
       code: 'status\ncode\ndetail\nbody',
+    },
+  },
+  '/guides/passkeys': {
+    anchors: [
+      { id: 'how-it-works', label: '1. How Passkeys Work in HVT' },
+      { id: 'react-integration', label: '2. One-Line Sign-in with React SDK' },
+      { id: 'registering-passkeys', label: '3. Registering New Passkeys' },
+      { id: 'replay-prevention', label: '4. Replay & Cloning Attack Prevention' },
+    ],
+    sample: {
+      label: 'Passkey Auth',
+      code: 'const { loginWithPasskey } = useHVTAuth();\nawait loginWithPasskey();',
+    },
+  },
+  '/guides/magic-links': {
+    anchors: [
+      { id: 'how-it-works', label: '1. Security Architecture' },
+      { id: 'react-request', label: '2. Requesting a Magic Link' },
+      { id: 'verifying', label: '3. Verification Route & Callback' },
+    ],
+    sample: {
+      label: 'Magic Link',
+      code: 'await requestMagicLink({ email });',
+    },
+  },
+  '/guides/mfa': {
+    anchors: [
+      { id: 'totp-overview', label: '1. TOTP Security Architecture' },
+      { id: 'setup-flow', label: '2. Enrolling an Authenticator (QR Code)' },
+      { id: 'login-challenge', label: '3. Two-Factor Login Challenge' },
+      { id: 'sdk-methods', label: '4. SDK Methods Reference' },
+    ],
+    sample: {
+      label: 'TOTP 2FA',
+      code: 'const { completeMfaLogin } = useHVTAuth();\nawait completeMfaLogin({ mfa_token, code });',
     },
   },
 };
@@ -382,6 +464,86 @@ export const SEO_META = {
       { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
       { name: 'SDK Reference', item: 'https://docs.hvts.app/sdk/errors' },
       { name: 'Error Handling', item: 'https://docs.hvts.app/sdk/errors' },
+    ],
+  },
+  '/sdk/react': {
+    title: 'React Components & Hooks – SDK Reference',
+    description:
+      'Complete reference for @hvt/sdk/react: HVTProvider, useHVTAuth hook, PermissionGate, and RoleGate components.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'SDK Reference', item: 'https://docs.hvts.app/sdk/react' },
+      { name: 'React SDK', item: 'https://docs.hvts.app/sdk/react' },
+    ],
+  },
+  '/guides/passkeys': {
+    title: 'Passkeys & WebAuthn (FIDO2 Biometrics) – HVT Guides',
+    description:
+      'Implement biometric passwordless sign-in using FIDO2 WebAuthn, Touch ID, Face ID, and security keys with HVT and @hvt/sdk.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/passkeys' },
+      { name: 'Passkeys & WebAuthn', item: 'https://docs.hvts.app/guides/passkeys' },
+    ],
+  },
+  '/guides/magic-links': {
+    title: 'Passwordless Magic Links – HVT Guides',
+    description:
+      'Send secure 1-click magic sign-in links via email with single-use SHA-256 tokens and constant-time cryptographic verification in HVT.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/magic-links' },
+      { name: 'Magic Links', item: 'https://docs.hvts.app/guides/magic-links' },
+    ],
+  },
+  '/guides/mfa': {
+    title: 'Two-Factor Authentication (TOTP) – HVT Guides',
+    description:
+      'Configure and enforce RFC 6238 TOTP two-factor authentication with QR code setup and authenticator apps in HVT.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/mfa' },
+      { name: 'Two-Factor Authentication', item: 'https://docs.hvts.app/guides/mfa' },
+    ],
+  },
+  '/guides/integration': {
+    title: 'Integration Guide – HVT Guides',
+    description:
+      'Step-by-step guide to integrating HVT authentication into client applications, SPAs, SSR frameworks, and backends.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/integration' },
+      { name: 'Integration Guide', item: 'https://docs.hvts.app/guides/integration' },
+    ],
+  },
+  '/guides/tenant-isolation': {
+    title: 'Tenant Isolation Architecture – HVT Guides',
+    description:
+      'Deep dive into multi-tenant composite identity (Project_ID + Email) and cryptographic project boundary enforcement.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/tenant-isolation' },
+      { name: 'Tenant Isolation', item: 'https://docs.hvts.app/guides/tenant-isolation' },
+    ],
+  },
+  '/guides/nextjs': {
+    title: 'Next.js 15 App Router Recipe – HVT Guides',
+    description:
+      'Integrate HVT into Next.js 15 App Router applications with Server Components, middleware session guards, and client hooks.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/nextjs' },
+      { name: 'Next.js 15 Recipe', item: 'https://docs.hvts.app/guides/nextjs' },
+    ],
+  },
+  '/guides/fastapi': {
+    title: 'FastAPI Backend Recipe – HVT Guides',
+    description:
+      'Verify HVT JWT access tokens and enforce project and role claims in Python FastAPI backends.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/fastapi' },
+      { name: 'FastAPI Recipe', item: 'https://docs.hvts.app/guides/fastapi' },
     ],
   },
 };
