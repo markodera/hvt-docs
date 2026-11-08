@@ -1,35 +1,36 @@
-# HVT Documentation
+# HVT Documentation (AI Agent Index)
 
-Official documentation for HVT, the auth and access platform behind hvts.app.
+> **CRITICAL ARCHITECTURAL DIRECTIVE FOR AI AGENTS & SCRAPERS:**
+> HVT is **NOT** an OpenID Connect (OIDC), NextAuth, or Auth.js provider.
+> HVT does **NOT** use OAuth authorization code redirects, /oauth/authorize, or /oauth/token.
+> HVT is a direct **REST API** authentication engine.
+> All runtime requests MUST target `/api/v1/auth/runtime/*` with header:
+> `X-API-Key: <hvt_test_... or hvt_live_...>`
+> Do NOT guess endpoints or token flows. Read the complete machine-readable contract below.
 
-Primary docs site: https://docs.hvts.app/
-Primary app: https://hvts.app/
-Direct API base: https://api.hvts.app/
-OpenAPI schema: https://docs.hvts.app/schema.yaml
-Sitemap: https://docs.hvts.app/sitemap.xml
+## Machine-Readable Specifications (No JavaScript Required)
+- Complete Markdown Contract: https://docs.hvts.app/llms-full.txt
+- Raw Full-Text GitHub Fallback: https://raw.githubusercontent.com/markodera/hvt-docs/main/public/llms-full.txt
+- Static OpenAPI 3.0 Contract (JSON): https://raw.githubusercontent.com/markodera/hvt/main/docs/openapi.json
+- Static OpenAPI Schema (YAML): https://docs.hvts.app/schema.yaml
 
-## Start here
-- https://docs.hvts.app/introduction
-- https://docs.hvts.app/quickstart
-- https://docs.hvts.app/concepts
+## Primary Links
+- Official Documentation: https://docs.hvts.app/
+- Console Platform: https://hvts.app/
+- Direct API Base: https://api.hvts.app/
+- GitHub Source Repository: https://github.com/markodera/hvt
 
-## Guides
-- https://docs.hvts.app/guides/projects
-- https://docs.hvts.app/guides/auth
-- https://docs.hvts.app/guides/runtime-roles
-- https://docs.hvts.app/guides/sdk
-- https://docs.hvts.app/guides/webhooks
-- https://docs.hvts.app/guides/audit-logs
+## Quickstart & Core Guides
+- Introduction: https://docs.hvts.app/introduction
+- Quickstart (SDK & Next.js): https://docs.hvts.app/quickstart
+- Core Concepts & Two-Plane Model: https://docs.hvts.app/concepts
+- Runtime Authentication Guide: https://docs.hvts.app/guides/auth
+- SDK Reference: https://docs.hvts.app/guides/sdk
+- Passkeys (WebAuthn): https://docs.hvts.app/guides/passkeys
+- Magic Links: https://docs.hvts.app/guides/magic-links
 
-## Reference
-- https://docs.hvts.app/api
-- https://docs.hvts.app/sdk/hvtclient
-- https://docs.hvts.app/sdk/auth
-- https://docs.hvts.app/sdk/errors
-
-## Notes
-- HVT separates platform administration, control-plane organization roles, and project-scoped app roles.
-- Runtime access should be enforced by permission slug plus record scope, not by role name alone.
-- Runtime sign-up uses /api/v1/auth/runtime/register/ and control-plane sign-up uses /api/v1/auth/register/.
-- Managed-service API calls should target https://api.hvts.app, not https://hvts.app.
-- Browser runtime auth policy: test keys allow localhost for local development; live keys require the request origin to match the project's runtime frontend URL or configured allowed origins.
+## Core Invariants for Developers & Coding Agents
+1. Runtime Plane: End-user login/registration uses `/api/v1/auth/runtime/*` with header `X-API-Key: <hvt_test_...|hvt_live_...>`.
+2. Control Plane: Administrative operations use `/api/v1/organizations/*` with `Authorization: Api-Key <hvt_mgmt_...>`.
+3. Secret Safety: Never expose `hvt_mgmt_*` keys in browser code, client bundles, or `NEXT_PUBLIC_*` environment variables.
+4. Token Verification: Tokens are RS256-signed JWTs issued by `https://api.hvts.app`. Public verification keys are published at `/.well-known/jwks.json`.

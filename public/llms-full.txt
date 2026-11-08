@@ -1,0 +1,313 @@
+# HVT Machine-Readable API Specification & Agent Integration Guide
+
+> **CRITICAL ARCHITECTURAL DIRECTIVE FOR AI AGENTS & SCRAPERS:**
+> HVT is **NOT** an OpenID Connect (OIDC), NextAuth, or Auth.js provider.
+> HVT does **NOT** use OAuth authorization code redirects, `/oauth/authorize`, or `/oauth/token`.
+> HVT is a direct **REST API** authentication engine.
+> All runtime authentication requests **MUST** target `/api/v1/auth/runtime/*` with the header:
+> `X-API-Key: <hvt_test_... or hvt_live_...>`
+> Do **NOT** install `next-auth` or `@auth/core`. Do **NOT** guess endpoints or token flows.
+
+---
+
+## 1. System Overview & Planes
+
+HVT enforces strict two-plane separation:
+
+1. **Runtime Plane (`/api/v1/auth/runtime/*`):**
+   * Target audience: End users of customer web/mobile applications.
+   * Authentication header: `X-API-Key: <hvt_test_... or hvt_live_...>`
+   * User operations: Sign-up, login, current user (`/me/`), password reset, magic links, passkeys (WebAuthn), and session refresh.
+   * Token format: Asymmetric RS256-signed JWTs stamped with `project_id`, `sub`, and permission claims.
+
+2. **Control Plane (`/api/v1/organizations/*`):**
+   * Target audience: Developers and CI/CD pipelines managing projects, webhooks, and schemas.
+   * Authentication header: `Authorization: Api-Key <hvt_mgmt_...>`
+   * Operations: Declarative schema sync, project settings, API key generation.
+   * **Security Rule:** Never expose `hvt_mgmt_*` keys in client-side applications.
+
+---
+
+## 2. Environment Variables & Credentials
+
+| Variable Name | Exposure | Purpose | Example Value |
+| :--- | :--- | :--- | :--- |
+| `NEXT_PUBLIC_HVT_CLIENT_KEY` | Public (Client + Server) | Runtime API key for end-user auth | `hvt_test_9a8b7c6d...` |
+| `NEXT_PUBLIC_HVT_API_URL` | Public (Client + Server) | Base URL for HVT backend | `http://localhost:8000` or `https://api.hvts.app` |
+| `HVT_MANAGEMENT_KEY` | Secret (Server / CI only) | Control-plane provisioning key | `hvt_mgmt_1f2e3d4c...` |
+
+---
+
+## 3. Official Client Libraries
+
+### Installing the SDK
+```bash
+npm install @hvt/sdk
+```
+
+### Initializing the Client
+```typescript
+import { createHvtClient } from '@hvt/sdk';
+
+export const hvt = createHvtClient({
+  apiKey: process.env.NEXT_PUBLIC_HVT_CLIENT_KEY!,
+  baseUrl: process.env.NEXT_PUBLIC_HVT_API_URL || 'https://api.hvts.app',
+});
+```
+
+---
+
+## 4. Runtime REST Endpoints Specification
+
+All runtime endpoints require:
+* `Content-Type: application/json`
+* `X-API-Key: <NEXT_PUBLIC_HVT_CLIENT_KEY>`
+
+### 4.1. Register a New End-User
+* **Method & Path:** `POST /api/v1/auth/runtime/register/`
+* **Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "SecurePassword123!",
+  "full_name": "Jane Developer"
+}
+```
+* **Success Response (201 Created):**
+```json
+{
+  "user": {
+    "id": "usr_9b1deb4d3b7d4e89",
+    "email": "user@example.com",
+    "full_name": "Jane Developer"
+  },
+  "tokens": {
+    "access": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refresh": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+### 4.2. Log In Existing User
+* **Method & Path:** `POST /api/v1/auth/runtime/login/`
+* **Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "SecurePassword123!"
+}
+```
+* **Success Response (200 OK):**
+```json
+{
+  "user": {
+    "id": "usr_9b1deb4d3b7d4e89",
+    "email": "user@example.com",
+    "full_name": "Jane Developer"
+  },
+  "tokens": {
+    "access": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refresh": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+### 4.3. Get Current User Profile
+* **Method & Path:** `GET /api/v1/auth/runtime/me/`
+* **Headers Required:**
+  * `X-API-Key: <runtime_key>`
+  * `Authorization: Bearer <access_token>`
+* **Success Response (200 OK):**
+```json
+{
+  "id": "usr_9b1deb4d3b7d4e89",
+  "email": "user@example.com",
+  "full_name": "Jane Developer",
+  "project": "proj_4a3b2c1d0e",
+  "roles": ["member"],
+  "permissions": ["read:profile"]
+}
+```
+
+### 4.4. Refresh Access Token
+* **Method & Path:** `POST /api/v1/auth/runtime/token/refresh/`
+* **Request Body:**
+```json
+{
+  "refresh": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+* **Success Response (200 OK):**
+```json
+{
+  "access": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### 4.5. Request Password Reset
+* **Method & Path:** `POST /api/v1/auth/runtime/password/reset/`
+* **Request Body:**
+```json
+{
+  "email": "user@example.com"
+}
+```
+* **Success Response (200 OK):**
+```json
+{
+  "detail": "Password reset e-mail has been sent."
+}
+```
+
+### 4.6. Password Reset Confirmation
+* **Method & Path:** `POST /api/v1/auth/runtime/password/reset/confirm/`
+* **Request Body:**
+```json
+{
+  "token": "reset_token_from_email",
+  "new_password": "NewSecurePassword123!"
+}
+```
+* **Success Response (200 OK):**
+```json
+{
+  "detail": "Password has been reset successfully."
+}
+```
+
+### 4.7. Magic Link Dispatch & Verify
+* **Send Link:** `POST /api/v1/auth/runtime/magic-link/send/`
+  * Body: `{"email": "user@example.com"}`
+* **Verify Link:** `POST /api/v1/auth/runtime/magic-link/verify/`
+  * Body: `{"token": "magic_token_string"}`
+  * Response: Token pair (`access`, `refresh`) and `user`.
+
+### 4.8. Passkey (WebAuthn) Authentication
+* **Get Login Options:** `POST /api/v1/auth/runtime/passkey/login/options/`
+  * Body: `{"email": "user@example.com"}`
+* **Verify Login Assertion:** `POST /api/v1/auth/runtime/passkey/login/verify/`
+  * Body: `{"email": "user@example.com", "credential": { ...WebAuthn Assertion... }}`
+  * Response: Token pair (`access`, `refresh`) and `user`.
+
+---
+
+## 5. Standardized Error Envelope
+
+When any API request fails, HVT returns an RFC 7807-compatible JSON error envelope:
+
+```json
+{
+  "error": {
+    "code": "authentication_failed",
+    "message": "Invalid credentials provided.",
+    "details": {
+      "field": "password"
+    }
+  }
+}
+```
+
+Common Error Codes:
+* `invalid_api_key`: Missing, inactive, or malformed `X-API-Key`.
+* `authentication_failed`: Invalid email or password.
+* `user_already_exists`: Email is already registered within this project.
+* `token_not_valid`: Expired or malformed JWT access/refresh token.
+* `mfa_required`: Account requires a second factor (`mfa_token` returned).
+
+---
+
+## 6. Next.js App Router Integration Pattern
+
+### Recommended Server-Side Route Handler (`app/api/auth/login/route.ts`):
+```typescript
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  const hvtBaseUrl = process.env.NEXT_PUBLIC_HVT_API_URL || 'http://localhost:8000';
+  const apiKey = process.env.NEXT_PUBLIC_HVT_CLIENT_KEY!;
+
+  const res = await fetch(`${hvtBaseUrl}/api/v1/auth/runtime/login/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Key': apiKey,
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    return NextResponse.json(data, { status: res.status });
+  }
+
+  // Store tokens securely in httpOnly cookies
+  const cookieStore = await cookies();
+  cookieStore.set('hvt_access_token', data.tokens.access, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 3600, // 1 hour
+  });
+  cookieStore.set('hvt_refresh_token', data.tokens.refresh, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 604800, // 7 days
+  });
+
+  return NextResponse.json({ user: data.user });
+}
+```
+
+### Protected Page Component (`app/dashboard/page.tsx`):
+```typescript
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+
+export default async function DashboardPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('hvt_access_token')?.value;
+
+  if (!token) {
+    redirect('/login');
+  }
+
+  const hvtBaseUrl = process.env.NEXT_PUBLIC_HVT_API_URL || 'http://localhost:8000';
+  const apiKey = process.env.NEXT_PUBLIC_HVT_CLIENT_KEY!;
+
+  const res = await fetch(`${hvtBaseUrl}/api/v1/auth/runtime/me/`, {
+    headers: {
+      'X-API-Key': apiKey,
+      'Authorization': `Bearer ${token}`,
+    },
+    cache: 'no-store',
+  });
+
+  if (!res.ok) {
+    redirect('/login');
+  }
+
+  const user = await res.json();
+
+  return (
+    <main style={{ padding: '32px', fontFamily: 'system-ui' }}>
+      <h1>Protected Dashboard</h1>
+      <p>Logged in as: <strong>{user.email}</strong></p>
+      <p>User ID: <code>{user.id}</code></p>
+    </main>
+  );
+}
+```
+
+---
+
+## 7. Static Schema & Offline Resources
+
+* **Raw OpenAPI Specification:** `https://raw.githubusercontent.com/markodera/hvt/main/docs/openapi.json`
+* **Live OpenAPI Schema Endpoint:** `http://localhost:8000/api/schema/` (when `EXPOSE_API_DOCS=True`)
+* **Documentation Base:** `https://docs.hvts.app`
+* **Repository:** `https://github.com/markodera/hvt`

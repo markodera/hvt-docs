@@ -26,7 +26,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build:client": "vite build",
+    "build:server": "vite build --ssr src/entry-server.jsx --outDir dist-ssr",
+    "build:prerender": "node scripts/prerender.js",
+    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },

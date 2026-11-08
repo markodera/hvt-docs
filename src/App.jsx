@@ -134,7 +134,7 @@ function PageLoader() {
   );
 }
 
-const docsRoutes = [
+export const docsRoutes = [
   { path: 'introduction', element: <IntroductionPage /> },
   { path: 'quickstart', element: <QuickstartPage /> },
   { path: 'concepts', element: <ConceptsPage /> },
@@ -158,33 +158,35 @@ const docsRoutes = [
   { path: 'sdk/errors', element: <SDKErrorsPage /> },
 ];
 
-const router = createBrowserRouter(
-  [
-    {
-      path: '/',
-      element: <TopNav />,
-      children: [
-        { index: true, element: <Navigate to="/introduction" replace /> },
-        {
-          element: (
-            <Suspense fallback={<PageLoader />}>
-              <DocsLayout />
-            </Suspense>
-          ),
-          children: docsRoutes,
-        },
-        { path: '*', element: <NotFoundPage /> },
-      ],
-    },
-  ],
+export const routes = [
   {
-    future: {
-      v7_startTransition: true,
-      v7_relativeSplatPath: true,
-    },
+    path: '/',
+    element: <TopNav />,
+    children: [
+      { index: true, element: <Navigate to="/introduction" replace /> },
+      {
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <DocsLayout />
+          </Suspense>
+        ),
+        children: docsRoutes,
+      },
+      { path: '*', element: <NotFoundPage /> },
+    ],
   },
-);
+];
+
+let clientRouter = null;
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  if (!clientRouter && typeof window !== 'undefined') {
+    clientRouter = createBrowserRouter(routes, {
+      future: {
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      },
+    });
+  }
+  return clientRouter ? <RouterProvider router={clientRouter} /> : null;
 }
