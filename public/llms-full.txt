@@ -167,8 +167,8 @@ All runtime endpoints require:
 * **Request Body:**
 ```json
 {
-  "uid": "dXNyXzliMWRlYjRkM2I3ZDRlODk",
-  "token": "bq2k1a-7b3b4f9812908a8a",
+  "uid": "<uidb64_from_email>",
+  "token": "<token_from_email>",
   "new_password1": "NewSecurePassword123!",
   "new_password2": "NewSecurePassword123!"
 }
