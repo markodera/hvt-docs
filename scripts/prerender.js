@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -26,8 +27,23 @@ console.log(`[PRERENDER] Starting prerender for ${prerenderRoutes.length} routes
 
 for (const url of prerenderRoutes) {
   try {
-    const { html: appHtml } = render(url);
-    const rendered = template.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
+    const { html: appHtml, helmet } = render(url);
+    let rendered = template.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
+
+    if (helmet) {
+      const helmetTitle = helmet.title?.toString() || '';
+      const helmetMeta = helmet.meta?.toString() || '';
+      const helmetLink = helmet.link?.toString() || '';
+      const helmetScript = helmet.script?.toString() || '';
+
+      if (helmetTitle) {
+        rendered = rendered.replace(/<title>.*?<\/title>/i, helmetTitle);
+      }
+      const helmetTags = [helmetMeta, helmetLink, helmetScript].filter(Boolean).join('\n    ');
+      if (helmetTags) {
+        rendered = rendered.replace('</head>', `    ${helmetTags}\n  </head>`);
+      }
+    }
 
     const slug = url.replace(/^\//, '');
     const relativePath = url === '/' ? 'index.html' : `${slug}/index.html`;

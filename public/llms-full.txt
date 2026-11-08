@@ -69,8 +69,10 @@ All runtime endpoints require:
 ```json
 {
   "email": "user@example.com",
-  "password": "SecurePassword123!",
-  "full_name": "Jane Developer"
+  "password1": "SecurePassword123!",
+  "password2": "SecurePassword123!",
+  "first_name": "Jane",
+  "last_name": "Developer"
 }
 ```
 * **Success Response (201 Created):**
@@ -79,7 +81,8 @@ All runtime endpoints require:
   "user": {
     "id": "usr_9b1deb4d3b7d4e89",
     "email": "user@example.com",
-    "full_name": "Jane Developer"
+    "first_name": "Jane",
+    "last_name": "Developer"
   },
   "tokens": {
     "access": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -130,7 +133,7 @@ All runtime endpoints require:
 ```
 
 ### 4.4. Refresh Access Token
-* **Method & Path:** `POST /api/v1/auth/runtime/token/refresh/`
+* **Method & Path:** `POST /api/v1/auth/token/refresh/`
 * **Request Body:**
 ```json
 {
@@ -160,18 +163,20 @@ All runtime endpoints require:
 ```
 
 ### 4.6. Password Reset Confirmation
-* **Method & Path:** `POST /api/v1/auth/runtime/password/reset/confirm/`
+* **Method & Path:** `POST /api/v1/auth/runtime/password/reset/confirm/{uidb64}/{token}/`
 * **Request Body:**
 ```json
 {
-  "token": "reset_token_from_email",
-  "new_password": "NewSecurePassword123!"
+  "uid": "dXNyXzliMWRlYjRkM2I3ZDRlODk",
+  "token": "bq2k1a-7b3b4f9812908a8a",
+  "new_password1": "NewSecurePassword123!",
+  "new_password2": "NewSecurePassword123!"
 }
 ```
 * **Success Response (200 OK):**
 ```json
 {
-  "detail": "Password has been reset successfully."
+  "detail": "Password has been reset with the new password."
 }
 ```
 
