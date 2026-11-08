@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import '@fontsource/inter/400.css';
@@ -12,10 +12,17 @@ import 'highlight.js/styles/atom-one-dark.css';
 import './index.css';
 import App from './App';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const container = document.getElementById('root');
+const app = (
   <React.StrictMode>
     <HelmetProvider>
       <App />
     </HelmetProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
+
+if (container && container.hasChildNodes()) {
+  ReactDOM.hydrateRoot(container, app);
+} else if (container) {
+  ReactDOM.createRoot(container).render(app);
+}
