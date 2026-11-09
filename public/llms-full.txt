@@ -47,12 +47,60 @@ npm install @hvt/sdk
 
 ### Initializing the Client
 ```typescript
-import { createHvtClient } from '@hvt/sdk';
+import { HVTClient } from '@hvt/sdk';
 
-export const hvt = createHvtClient({
+export const hvt = new HVTClient({
   apiKey: process.env.NEXT_PUBLIC_HVT_CLIENT_KEY!,
   baseUrl: process.env.NEXT_PUBLIC_HVT_API_URL || 'https://api.hvts.app',
 });
+```
+
+
+### Installing & Using the Official CLI (@hvt/cli)
+The official HVT CLI (`@hvt/cli`) manages roles, permissions, and OAuth providers as code via declarative JSON/YAML manifests.
+
+```bash
+# 1. Generate starter hvt.schema.json
+npx @hvt/cli init --providers google,github
+
+# 2. Check credentials & connectivity
+npx @hvt/cli whoami
+
+# 3. Dry-run schema diff preview (?dry_run=true)
+npx @hvt/cli schema plan
+
+# 4. Synchronize schema live & mint client key
+npx @hvt/cli schema sync --prune --yes
+```
+
+#### Starter Manifest (`hvt.schema.json`)
+```json
+{
+  "$schema": "https://hvts.app/schemas/hvt.schema.v1.json",
+  "schema_version": 1,
+  "permissions": [
+    { "slug": "documents:create", "name": "Create Documents", "description": "Create new documents" },
+    { "slug": "documents:read", "name": "Read Documents", "description": "View documents" }
+  ],
+  "roles": [
+    {
+      "slug": "member",
+      "name": "Member",
+      "description": "Standard user",
+      "is_default_signup": true,
+      "permissions": ["documents:create", "documents:read"]
+    }
+  ],
+  "social_providers": [
+    {
+      "provider": "google",
+      "client_id": "${GOOGLE_CLIENT_ID}",
+      "client_secret": "${GOOGLE_CLIENT_SECRET}",
+      "allowed_redirect_uris": ["http://localhost:3000/auth/callback"],
+      "is_active": true
+    }
+  ]
+}
 ```
 
 ---

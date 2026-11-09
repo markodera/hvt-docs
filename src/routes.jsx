@@ -23,6 +23,7 @@ import FastapiGuidePage from './pages/guides/FastapiGuidePage';
 import PasskeysGuidePage from './pages/guides/PasskeysGuidePage';
 import MagicLinksGuidePage from './pages/guides/MagicLinksGuidePage';
 import MfaGuidePage from './pages/guides/MfaGuidePage';
+import CliGuidePage from './pages/guides/CliGuidePage';
 import SDKAuthPage from './pages/sdk/SDKAuthPage';
 import SDKClientPage from './pages/sdk/SDKClientPage';
 import SDKErrorsPage from './pages/sdk/SDKErrorsPage';
@@ -39,6 +40,7 @@ export const docsRoutes = [
   { path: 'guides/integration', element: <IntegrationGuidePage /> },
   { path: 'guides/projects', element: <ProjectsGuidePage /> },
   { path: 'guides/runtime-roles', element: <RuntimeRolesGuidePage /> },
+  { path: 'guides/cli', element: <CliGuidePage /> },
   { path: 'guides/webhooks', element: <WebhooksGuidePage /> },
   { path: 'guides/audit-logs', element: <AuditLogsGuidePage /> },
   { path: 'guides/nextjs', element: <NextjsGuidePage /> },
@@ -59,14 +61,14 @@ export const routes = [
     path: '/',
     element: <TopNav />,
     children: [
-      { index: true, element: <Navigate to="/introduction" replace /> },
+
       {
         element: (
           <Suspense fallback={<PageLoader />}>
             <DocsLayout />
           </Suspense>
         ),
-        children: docsRoutes,
+        children: [{ index: true, element: <IntroductionPage /> }, ...docsRoutes],
       },
       { path: '*', element: <NotFoundPage /> },
     ],

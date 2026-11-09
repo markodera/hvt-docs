@@ -28,7 +28,7 @@ console.log(`[PRERENDER] Starting prerender for ${prerenderRoutes.length} routes
 for (const url of prerenderRoutes) {
   try {
     const { html: appHtml, helmet } = render(url);
-    let rendered = template.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
+    let rendered = template.replace('<div id="root"></div>', () => `<div id="root">${appHtml}</div>`);
 
     if (helmet) {
       const helmetTitle = helmet.title?.toString() || '';
