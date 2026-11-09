@@ -23,6 +23,9 @@ export const SIDEBAR_SECTIONS = [
       { title: 'Authentication flows', path: '/guides/auth' },
       { title: 'Runtime roles and permissions', path: '/guides/runtime-roles' },
       { title: 'Official CLI & schema sync', path: '/guides/cli' },
+      { title: 'Asymmetric JWKS & Tokens', path: '/guides/jwks' },
+      { title: 'Active Sessions & Revocation', path: '/guides/sessions' },
+      { title: 'Bring-Your-Own Email', path: '/guides/email' },
       { title: 'SDK usage', path: '/guides/sdk' },
       { title: 'Passkeys & WebAuthn', path: '/guides/passkeys' },
       { title: 'Passwordless Magic Links', path: '/guides/magic-links' },
@@ -165,6 +168,48 @@ await client.request('/api/v1/auth/runtime/me/', {
 if (!permissions.includes('orders.read.own')) {
   return 403
 }`,
+    },
+  },
+  '/guides/jwks': {
+    anchors: [
+      { id: 'overview', label: 'Why offline verification matters' },
+      { id: 'discovery', label: 'Public key endpoints' },
+      { id: 'claims', label: 'Token claims specification' },
+      { id: 'nextjs', label: 'Next.js 15 Edge Middleware' },
+      { id: 'fastapi', label: 'FastAPI offline verification' },
+      { id: 'express', label: 'Node.js & Express' },
+      { id: 'rotation', label: 'Key rotation resilience' },
+    ],
+    sample: {
+      label: 'Edge JWKS Verification',
+      code: "const { payload } = await jwtVerify(token, JWKS, { issuer, audience });",
+    },
+  },
+  '/guides/sessions': {
+    anchors: [
+      { id: 'architecture', label: 'Dual-layer session architecture' },
+      { id: 'token-link', label: 'How tokens link to sessions' },
+      { id: 'endpoints', label: 'Session API endpoints' },
+      { id: 'hybrid-verification', label: 'Hybrid verification pattern' },
+      { id: 'react-component', label: 'Active devices UI component' },
+    ],
+    sample: {
+      label: 'Remote Logout',
+      code: "DELETE /api/v1/auth/runtime/sessions/<session-uuid>/",
+    },
+  },
+  '/guides/email': {
+    anchors: [
+      { id: 'overview', label: 'Why custom email matters' },
+      { id: 'providers', label: 'Supported providers' },
+      { id: 'security', label: 'Encryption at rest' },
+      { id: 'inspect-config', label: 'Inspect settings' },
+      { id: 'configure', label: 'Provider recipes' },
+      { id: 'test-delivery', label: 'Testing email delivery' },
+    ],
+    sample: {
+      label: 'BYO Email Config',
+      code: 'PATCH .../email-config/ { provider: "resend", api_key: "re_..." }',
     },
   },
   '/guides/cli': {
@@ -393,6 +438,36 @@ export const SEO_META = {
       { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
       { name: 'Guides', item: 'https://docs.hvts.app/guides/auth' },
       { name: 'Authentication Flows', item: 'https://docs.hvts.app/guides/auth' },
+    ],
+  },
+  '/guides/jwks': {
+    title: 'Asymmetric RS256 Tokens & Public JWKS Offline Verification – HVT Guides',
+    description:
+      'Verify HVT tokens offline with zero network hops using standard RSA public keys and RFC 7517 JSON Web Key Sets in Next.js, FastAPI, and Node.js.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/jwks' },
+      { name: 'JWKS Offline Verification', item: 'https://docs.hvts.app/guides/jwks' },
+    ],
+  },
+  '/guides/sessions': {
+    title: 'Active Sessions & Instant Revocation – HVT Guides',
+    description:
+      'Track connected devices, inspect client IPs, and execute instant remote signouts with sub-millisecond Redis invalidation in HVT.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/sessions' },
+      { name: 'Active Sessions', item: 'https://docs.hvts.app/guides/sessions' },
+    ],
+  },
+  '/guides/email': {
+    title: 'Bring-Your-Own (BYO) Email Providers – HVT Guides',
+    description:
+      'Configure custom email delivery for magic links, password resets, and invitations with encrypted credentials across Resend, Postmark, SES, and SMTP.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/email' },
+      { name: 'BYO Email Providers', item: 'https://docs.hvts.app/guides/email' },
     ],
   },
   '/guides/cli': {

@@ -24,6 +24,9 @@ import PasskeysGuidePage from './pages/guides/PasskeysGuidePage';
 import MagicLinksGuidePage from './pages/guides/MagicLinksGuidePage';
 import MfaGuidePage from './pages/guides/MfaGuidePage';
 import CliGuidePage from './pages/guides/CliGuidePage';
+import JwksGuidePage from './pages/guides/JwksGuidePage';
+import SessionsGuidePage from './pages/guides/SessionsGuidePage';
+import EmailGuidePage from './pages/guides/EmailGuidePage';
 import SDKAuthPage from './pages/sdk/SDKAuthPage';
 import SDKClientPage from './pages/sdk/SDKClientPage';
 import SDKErrorsPage from './pages/sdk/SDKErrorsPage';
@@ -41,6 +44,9 @@ export const docsRoutes = [
   { path: 'guides/projects', element: <ProjectsGuidePage /> },
   { path: 'guides/runtime-roles', element: <RuntimeRolesGuidePage /> },
   { path: 'guides/cli', element: <CliGuidePage /> },
+  { path: 'guides/jwks', element: <JwksGuidePage /> },
+  { path: 'guides/sessions', element: <SessionsGuidePage /> },
+  { path: 'guides/email', element: <EmailGuidePage /> },
   { path: 'guides/webhooks', element: <WebhooksGuidePage /> },
   { path: 'guides/audit-logs', element: <AuditLogsGuidePage /> },
   { path: 'guides/nextjs', element: <NextjsGuidePage /> },
