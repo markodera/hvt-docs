@@ -22,6 +22,7 @@ export const SIDEBAR_SECTIONS = [
       { title: 'Projects and API keys', path: '/guides/projects' },
       { title: 'Authentication flows', path: '/guides/auth' },
       { title: 'Runtime roles and permissions', path: '/guides/runtime-roles' },
+      { title: 'Official CLI & schema sync', path: '/guides/cli' },
       { title: 'SDK usage', path: '/guides/sdk' },
       { title: 'Passkeys & WebAuthn', path: '/guides/passkeys' },
       { title: 'Passwordless Magic Links', path: '/guides/magic-links' },
@@ -164,6 +165,23 @@ await client.request('/api/v1/auth/runtime/me/', {
 if (!permissions.includes('orders.read.own')) {
   return 403
 }`,
+    },
+  },
+  '/guides/cli': {
+    anchors: [
+      { id: 'installation', label: '1. Installation' },
+      { id: 'init-schema', label: '2. Initialize schema manifest' },
+      { id: 'configure-env', label: '3. Environment credentials' },
+      { id: 'schema-manifest', label: '4. Manifest specification' },
+      { id: 'verify-connection', label: '5. Verify connectivity (whoami)' },
+      { id: 'plan-diff', label: '6. Preview changes (plan)' },
+      { id: 'sync-schema', label: '7. Synchronize live (sync)' },
+      { id: 'cicd-gitops', label: '8. CI/CD GitOps workflow' },
+      { id: 'cli-reference', label: '9. CLI flags reference' },
+    ],
+    sample: {
+      label: 'CLI commands',
+      code: 'npx @hvt/cli init\nnpx @hvt/cli whoami\nnpx @hvt/cli schema plan\nnpx @hvt/cli schema sync --prune --yes',
     },
   },
   '/guides/projects': {
@@ -375,6 +393,16 @@ export const SEO_META = {
       { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
       { name: 'Guides', item: 'https://docs.hvts.app/guides/auth' },
       { name: 'Authentication Flows', item: 'https://docs.hvts.app/guides/auth' },
+    ],
+  },
+  '/guides/cli': {
+    title: 'Official CLI & Schema Sync – HVT Guides',
+    description:
+      'Manage authorization schema as code with @hvt/cli. Define roles, permissions, and OAuth providers in JSON/YAML manifests, preview dry-run diffs, and sync via CI/CD.',
+    breadcrumbs: [
+      { name: 'HVT Documentation', item: 'https://docs.hvts.app/' },
+      { name: 'Guides', item: 'https://docs.hvts.app/guides/cli' },
+      { name: 'Official CLI & Schema Sync', item: 'https://docs.hvts.app/guides/cli' },
     ],
   },
   '/guides/projects': {

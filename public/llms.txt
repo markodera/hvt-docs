@@ -28,9 +28,11 @@
 - SDK Reference: https://docs.hvts.app/guides/sdk
 - Passkeys (WebAuthn): https://docs.hvts.app/guides/passkeys
 - Magic Links: https://docs.hvts.app/guides/magic-links
+- Official CLI & Schema Sync: https://docs.hvts.app/guides/cli
 
 ## Core Invariants for Developers & Coding Agents
 1. Runtime Plane: End-user login/registration uses `/api/v1/auth/runtime/*` with header `X-API-Key: <hvt_test_...|hvt_live_...>`.
 2. Control Plane: Administrative operations use `/api/v1/organizations/*` with `Authorization: Api-Key <hvt_mgmt_...>`.
 3. Secret Safety: Never expose `hvt_mgmt_*` keys in browser code, client bundles, or `NEXT_PUBLIC_*` environment variables.
 4. Token Verification: Tokens are RS256-signed JWTs issued by `https://api.hvts.app`. Public verification keys are published at `/.well-known/jwks.json`.
+5. Declarative GitOps CLI: Manage roles, permissions, and OAuth providers as code with `npx @hvt/cli` (`init`, `whoami`, `schema plan`, `schema sync --prune --yes`).
