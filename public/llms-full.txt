@@ -242,6 +242,40 @@ All runtime endpoints require:
   * Body: `{"email": "user@example.com", "credential": { ...WebAuthn Assertion... }}`
   * Response: Token pair (`access`, `refresh`) and `user`.
 
+### 4.9. Active Sessions & Remote Revocation
+* **List Active Sessions:** `GET /api/v1/auth/runtime/sessions/`
+  * Header: `Authorization: Bearer <user_access_token>`, `X-API-Key: <key>`
+  * Response: Array of session objects: `id`, `device_name`, `ip_address`, `user_agent`, `created_at`, `last_active_at`, `is_current`.
+* **Revoke Specific Session:** `DELETE /api/v1/auth/runtime/sessions/<uuid:pk>/`
+  * Response: `{"detail": "Session revoked successfully."}`
+* **Global Remote Logout:** `POST /api/v1/auth/runtime/sessions/revoke-all/`
+  * Response: `{"detail": "All other sessions have been revoked.", "revoked_count": N}`
+* **Mechanics:** Sub-millisecond Redis invalidation via `session:revoked:<sid>` key.
+
+### 4.10. Asymmetric RS256 Tokens & Public JWKS
+* **Discovery Endpoint:** `GET /.well-known/openid-configuration`
+* **Public Key Set:** `GET /.well-known/jwks.json`
+  * Response: RFC 7517 JWKS with active and rotated RSA public verification keys.
+  * Headers: `Cache-Control: public, max-age=3600`, `Access-Control-Allow-Origin: *`.
+* **Token Claims:** `sub` (user UUID), `iss`, `aud` (project UUID), `exp`, `iat`, `jti`, `sid` (session UUID), `email`, `role`, `app_roles` (string array), `app_permissions` (string array).
+* **Offline Verification:** Downstream microservices verify RS256 signatures locally in ~0.2ms using `jose` (Node.js) or `pyjwt[crypto]` (Python) with zero outbound HTTP roundtrips.
+
+### 4.11. Bring-Your-Own (BYO) Email Providers
+* **Inspect Config:** `GET /api/v1/organizations/current/projects/<id>/email-config/`
+  * Returns provider type and redacted secret flags: `has_api_key`, `has_smtp_password`, `has_aws_secret_access_key`.
+* **Update Config:** `PATCH /api/v1/organizations/current/projects/<id>/email-config/`
+  * Supported providers: `resend` (`api_key`), `postmark` (`api_key`), `ses` (`aws_region`, `aws_access_key_id`, `aws_secret_access_key`), `smtp` (`smtp_host`, `smtp_port`, `smtp_username`, `smtp_password`, `smtp_use_tls`, `smtp_use_ssl`), `system_default`.
+  * Security: All credentials encrypted at rest with MultiFernet AES encryption.
+* **Test Delivery:** `POST /api/v1/organizations/current/projects/<id>/email-config/test/` (`{"to_email": "..."}`).
+
+### 4.12. Webhooks & Transactional Outbox
+* **Delivery Logs:** `GET /api/v1/organizations/current/webhooks/<id>/deliveries/`
+  * Returns attempt history, status code, latency (ms), and next retry timestamp.
+* **Delivery Stats:** `GET /api/v1/organizations/current/webhooks/stats/`
+* **Signature Header:** `X-HVT-Signature: t=<timestamp>,v1=<hmac_sha256_hex>`
+  * Signature calculated as `HMAC-SHA256(secret, "${timestamp}.${raw_body}")`.
+* **Retry Engine:** 5 retries with exponential backoff (1m, 5m, 15m, 1h, 6h). Auto-disables after 10 consecutive failures.
+
 ---
 
 ## 5. Standardized Error Envelope
